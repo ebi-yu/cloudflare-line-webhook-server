@@ -28,7 +28,7 @@ async function handleRequest(request: Request, env: Record<string, string>): Pro
 			GITHUB_COMMITTER_EMAIL: env.GITHUB_COMMITTER_EMAIL,
 		};
 		const missingVars = Object.entries(ENV)
-			.filter(([key, value]) => !value)
+			.filter(([_key, value]) => !value)
 			.map(([key]) => key);
 		if (missingVars.length > 0) {
 			throw new InternalServerError(`Cloudflare Env setting error: Missing variables - ${missingVars.join(', ')}`);
