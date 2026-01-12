@@ -2,18 +2,36 @@
 
 LINE Webhookからのメッセージを受け取り、GitHubリポジトリにマークダウンファイルとして保存するCloudflare Workersアプリケーションです。
 
+このプロジェクトはpnpmモノレポ構成となっており、今後複数のサーバーを追加可能な構造になっています。
+
 ## 機能
 
 - LINE Webhookからのメッセージを受信
 - 受信したメッセージをGitHubリポジトリに保存
 - LINE Botからの応答（エコーバック）
 
+## モノレポ構成
+
+```
+cloudflare-line-webhook-server/
+├── packages/
+│   └── line-webhook-server/     # LINE Webhook サーバー
+│       ├── src/                 # ソースコード
+│       ├── wrangler.jsonc       # Cloudflare Workers設定
+│       ├── tsconfig.json        # TypeScript設定
+│       └── package.json         # パッケージ設定
+├── pnpm-workspace.yaml          # pnpmワークスペース設定
+├── package.json                 # ルートパッケージ設定
+└── README.md
+```
+
 ## セットアップ手順
 
 ### 前提条件
 
 - [Node.js](https://nodejs.org/) (v16以上)
-- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/install-and-update/) (`npm install -g wrangler`)
+- [pnpm](https://pnpm.io/) (`npm install -g pnpm`)
+- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/install-and-update/)
 - [GitHubアカウント](https://github.com/signup)
 
 ### 1. GitHubアカウントとパーソナルアクセストークンの発行
@@ -41,10 +59,19 @@ git clone https://github.com/yourusername/cloudflare-line-webhook-server.git
 cd cloudflare-line-webhook-server
 ```
 
-5. 依存関係をインストールします：
+5. pnpmがインストールされていない場合はインストールします：
 
 ```bash
-npm install
+npm install -g pnpm
+# または
+corepack enable
+corepack prepare pnpm@latest --activate
+```
+
+6. 依存関係をインストールします：
+
+```bash
+pnpm install
 ```
 
 ### 3. LINE Developerの設定
@@ -77,7 +104,7 @@ npm install
 
 ### 4. wrangler.jsoncの設定
 
-wrangler.jsonc ファイルを編集して、以下の環境変数を設定します：
+`packages/line-webhook-server/wrangler.jsonc` ファイルを編集して、以下の環境変数を設定します：
 
 ```jsonc
 {
@@ -103,6 +130,9 @@ wrangler.jsonc ファイルを編集して、以下の環境変数を設定し�
 以下のコマンドを実行して、シークレット情報を設定します：
 
 ```bash
+# packages/line-webhook-server ディレクトリに移動
+cd packages/line-webhook-server
+
 # GitHub トークン
 wrangler secret put GITHUB_TOKEN
 
@@ -118,7 +148,7 @@ wrangler secret put LINE_OWN_USER_ID
 
 ### 6. ローカルでの起動
 
-開発環境でテストするには、`.dev.vars`ファイルを作成し、以下の内容を設定します：
+開発環境でテストするには、`packages/line-webhook-server/.dev.vars`ファイルを作成し、以下の内容を設定します：
 
 ```env
 GITHUB_TOKEN=your-github-personal-access-token
@@ -134,20 +164,20 @@ GITHUB_COMMITTER_NAME=your-name
 GITHUB_COMMITTER_EMAIL=your-email@example.com
 ```
 
-ローカル開発サーバーを起動します：
+ローカル開発サーバーを起動します（ルートディレクトリから）：
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 これにより、ローカルでWorkersが起動し、`http://localhost:8787`でアクセスできます。
 
 ### 7. デプロイ
 
-Cloudflare Workersにデプロイするには：
+Cloudflare Workersにデプロイするには（ルートディレクトリから）：
 
 ```bash
-npm run deploy
+pnpm deploy
 ```
 
 デプロイが完了すると、Workersのエンドポイントが表示されます（例：`https://your-worker-name.your-subdomain.workers.dev`）。
@@ -160,23 +190,70 @@ npm run deploy
 2. メッセージを送信します
 3. メッセージがGitHubリポジトリに保存され、LINEでエコーバックされます
 
+## 利用可能なコマンド
+
+ルートディレクトリから以下のコマンドが使用できます：
+
+```bash
+# 開発サーバーの起動
+pnpm dev
+
+# デプロイ
+pnpm deploy
+
+# テストの実行
+pnpm test
+
+# 型生成
+pnpm cf-typegen
+```
+
+特定のパッケージのみで実行する場合：
+
+```bash
+pnpm --filter line-webhook-server dev
+pnpm --filter line-webhook-server deploy
+```
+
+## 新しいサーバーの追加方法
+
+このプロジェクトはモノレポ構成のため、新しいサーバーを簡単に追加できます：
+
+1. `packages/` ディレクトリに新しいサーバー用のディレクトリを作成
+2. 必要なファイル（`package.json`, `tsconfig.json`, `wrangler.jsonc`, `src/`など）を追加
+3. ルートの`package.json`にスクリプトを追加（必要に応じて）
+4. `pnpm install`を実行
+
+例：
+```bash
+mkdir -p packages/new-server
+cd packages/new-server
+# 必要なファイルを作成...
+cd ../..
+pnpm install
+```
+
 ## プロジェクト構成
 
 ```md
-src/
-├── handlers/        # 各種イベントハンドラー
-│   ├── github.ts    # GitHub API リクエスト
-│   ├── line.ts      # LINE Webhook の処理
-│   ├── webhook.ts   # メインの Webhook 処理
-├── utils/           # ユーティリティ関数
-│   ├── base64.ts    # Base64 エンコード/デコード
-│   ├── env.ts       # 環境変数の取得
-│   ├── logger.ts    # ログ関連の関数
-├── types/           # 型定義
-│   ├── github.ts    # GitHub API 用の型
-│   ├── line.ts      # LINE Webhook 用の型
-│   ├── index.ts     # 共通の型
-├── index.ts         # エントリーポイント
+packages/line-webhook-server/
+├── src/
+│   ├── handlers/        # 各種イベントハンドラー
+│   │   ├── github.ts    # GitHub API リクエスト
+│   │   ├── line.ts      # LINE Webhook の処理
+│   │   └── webhook.ts   # メインの Webhook 処理
+│   ├── utils/           # ユーティリティ関数
+│   │   ├── base64.ts    # Base64 エンコード/デコード
+│   │   ├── env.ts       # 環境変数の取得
+│   │   └── logger.ts    # ログ関連の関数
+│   ├── types/           # 型定義
+│   │   ├── github.ts    # GitHub API 用の型
+│   │   ├── line.ts      # LINE Webhook 用の型
+│   │   └── index.ts     # 共通の型
+│   └── index.ts         # エントリーポイント
+├── wrangler.jsonc       # Cloudflare Workers設定
+├── tsconfig.json        # TypeScript設定
+└── package.json         # パッケージ設定
 ```
 
 ## トラブルシューティング

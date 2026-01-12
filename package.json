@@ -1,12 +1,12 @@
 {
-	"name": "polished-boat-baf3",
+	"name": "cloudflare-line-webhook-server",
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
-		"deploy": "wrangler deploy",
-		"dev": "wrangler dev",
-		"test": "vitest",
-		"cf-typegen": "wrangler types"
+		"dev": "pnpm --filter line-webhook-server dev",
+		"deploy": "pnpm --filter line-webhook-server deploy",
+		"test": "pnpm --filter line-webhook-server test",
+		"cf-typegen": "pnpm --filter line-webhook-server cf-typegen"
 	},
 	"devDependencies": {
 		"@cloudflare/vitest-pool-workers": "^0.7.5",
@@ -14,5 +14,6 @@
 		"typescript": "^5.5.2",
 		"vitest": "~3.0.7",
 		"wrangler": "^4.0.0"
-	}
+	},
+	"packageManager": "pnpm@9.0.0"
 }
