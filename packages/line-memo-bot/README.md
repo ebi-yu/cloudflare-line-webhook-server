@@ -1,4 +1,4 @@
-# LINE Webhook Server
+# LINE memo Bot
 
 LINE Webhookからのメッセージを受け取り、GitHubリポジトリにマークダウンファイルとして保存するCloudflare Workersアプリケーションです。
 
