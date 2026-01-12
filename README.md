@@ -59,7 +59,7 @@ git clone https://github.com/yourusername/cloudflare-line-webhook-server.git
 cd cloudflare-line-webhook-server
 ```
 
-5. pnpmがインストールされていない場合はインストールします：
+1. pnpmがインストールされていない場合はインストールします：
 
 ```bash
 npm install -g pnpm
@@ -68,7 +68,7 @@ corepack enable
 corepack prepare pnpm@latest --activate
 ```
 
-6. 依存関係をインストールします：
+1. 依存関係をインストールします：
 
 ```bash
 pnpm install
@@ -225,6 +225,7 @@ pnpm --filter line-webhook-server deploy
 4. `pnpm install`を実行
 
 例：
+
 ```bash
 mkdir -p packages/new-server
 cd packages/new-server

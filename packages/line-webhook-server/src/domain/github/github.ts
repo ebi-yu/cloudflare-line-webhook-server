@@ -1,11 +1,11 @@
-import { GitHubFileCreateParams } from '../types/github';
-import { utf8ToBase64 } from '../utils/base64';
-import { error } from '../utils/logger';
+import { utf8ToBase64 } from '../../utils/base64';
+import { InternalServerError } from '../../utils/error';
+import { GitHubFileCreateParams } from './types';
 
 /**
  * Githubにファイル作成リクエストを送信
  */
-export async function sendFileCreateRequestToGithub(params: GitHubFileCreateParams): Promise<Response | void> {
+export async function sendFileCreateRequestToGithub(params: GitHubFileCreateParams): Promise<void> {
 	const { path, owner, repoName, message, githubToken } = params;
 
 	// 日付をファイル名にする
@@ -38,11 +38,12 @@ export async function sendFileCreateRequestToGithub(params: GitHubFileCreatePara
 	try {
 		const res = await fetch(repoUrl, requestOptions);
 		if (res.status !== 201) {
-			error('Failed to create file to github repository', { status: res.status });
-			return new Response('Failed to create file to github repository', { status: 500 });
+			throw new InternalServerError('Failed to create file to github repository', { status: res.status });
 		}
 	} catch (err) {
-		error('Error sending request to GitHub', err);
-		return new Response('Error sending request to GitHub', { status: 500 });
+		if (err instanceof InternalServerError) {
+			throw err;
+		}
+		throw new InternalServerError('Error sending request to GitHub', err);
 	}
 }
