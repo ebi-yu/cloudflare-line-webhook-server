@@ -1,7 +1,7 @@
 import { LineWebhookEvent } from '../types';
 import { LineMessageEvent, LineMessageEventError } from '../vo/LineMessageEvent';
 import { LineWebhookConfig } from '../vo/LineWebhookConfig';
-import { isValidSignature, sendReply } from './lineApiclient';
+import { isValidSignature, sendReply } from './LINEApiClients';
 
 /**
  * LINE Webhookのバリデーション処理

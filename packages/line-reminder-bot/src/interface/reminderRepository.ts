@@ -1,6 +1,21 @@
 import { Reminder, ReminderInput } from '../types';
 
 /**
+ * D1の結果（スネークケース）をReminderオブジェクト（キャメルケース）に変換
+ */
+function mapDbRowToReminder(row: any): Reminder {
+	return {
+		id: row.id,
+		userId: row.user_id,
+		message: row.message,
+		executionTime: row.execution_time,
+		createdAt: row.created_at,
+		groupId: row.group_id,
+		intervalLabel: row.interval_label,
+	};
+}
+
+/**
  * リマインダーをデータベースに保存
  */
 export async function createReminder(db: D1Database, userId: string, input: ReminderInput): Promise<Reminder> {
@@ -38,9 +53,9 @@ export async function createReminder(db: D1Database, userId: string, input: Remi
  * ユーザーのリマインダー一覧を取得
  */
 export async function getRemindersByUserId(db: D1Database, userId: string): Promise<Reminder[]> {
-	const result = await db.prepare(`SELECT * FROM reminders WHERE user_id = ? ORDER BY execution_time ASC`).bind(userId).all<Reminder>();
+	const result = await db.prepare(`SELECT * FROM reminders WHERE user_id = ? ORDER BY execution_time ASC`).bind(userId).all();
 
-	return result.results || [];
+	return (result.results || []).map(mapDbRowToReminder);
 }
 
 /**
@@ -57,7 +72,7 @@ export async function deleteReminder(db: D1Database, id: string, userId: string)
  */
 export async function getDueReminders(db: D1Database): Promise<Reminder[]> {
 	const now = Date.now();
-	const result = await db.prepare(`SELECT * FROM reminders WHERE execution_time <= ?`).bind(now).all<Reminder>();
+	const result = await db.prepare(`SELECT * FROM reminders WHERE execution_time <= ?`).bind(now).all();
 
-	return result.results || [];
+	return (result.results || []).map(mapDbRowToReminder);
 }

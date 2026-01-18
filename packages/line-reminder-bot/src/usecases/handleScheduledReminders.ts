@@ -14,6 +14,13 @@ export async function handleScheduledReminders(env: Env): Promise<void> {
 
 		for (const reminder of dueReminders) {
 			try {
+				// userIdの検証
+				if (!reminder.userId) {
+					console.error(`Reminder ${reminder.id} has no userId, skipping`);
+					await deleteReminder(env.DB, reminder.id, reminder.userId || '');
+					continue;
+				}
+
 				// リマインドメッセージを送信（間隔ラベルを含む）
 				const label = reminder.intervalLabel ? `[${reminder.intervalLabel}] ` : '';
 				await sendPushMessage(reminder.userId, `🔔 リマインド ${label}\n\n${reminder.message}`, env.LINE_CHANNEL_TOKEN);
