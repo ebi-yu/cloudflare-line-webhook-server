@@ -44,6 +44,7 @@ export default {
 					replyToken: messageEvent.replyToken,
 					env,
 				});
+
 				return new Response('OK', { status: 200 });
 			}
 
@@ -63,6 +64,7 @@ export default {
 					replyToken: postBackEvent.replyToken,
 					env,
 				});
+
 				return new Response('OK', { status: 200 });
 			}
 

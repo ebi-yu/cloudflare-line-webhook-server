@@ -13,13 +13,6 @@ export async function processScheduledReminders(env: any): Promise<void> {
 
 		for (const reminder of dueReminders) {
 			try {
-				// userIdの検証
-				if (!reminder.userId) {
-					console.error(`Reminder ${reminder.id} has no userId, skipping`);
-					await deleteReminder(env.DB, reminder.id, reminder.userId || '');
-					continue;
-				}
-
 				// リマインドメッセージを送信（間隔ラベルを含む）
 				const label = reminder.intervalLabel ? `[${reminder.intervalLabel}] ` : '';
 				const quickReply = {
@@ -38,7 +31,6 @@ export async function processScheduledReminders(env: any): Promise<void> {
 
 				// このリマインダーを削除（他の間隔のリマインダーは保持される）
 				await deleteReminder(env.DB, reminder.id, reminder.userId);
-				console.log(`Reminder ${reminder.id} (${reminder.intervalLabel || 'no label'}) sent and deleted`);
 			} catch (error) {
 				console.error(`Error processing reminder ${reminder.id}:`, error);
 			}

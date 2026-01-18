@@ -36,9 +36,11 @@ export default {
 
 			// 6. ビジネスロジック実行
 			await recordMemoFromLine({ message: messageEvent.message, replyToken: messageEvent.replyToken, env });
+
 			return new Response('OK', { status: 200 });
 		} catch (error) {
 			console.error('Error handling webhook:', error);
+
 			if (error instanceof ServerErrorException) {
 				return new Response(
 					JSON.stringify({

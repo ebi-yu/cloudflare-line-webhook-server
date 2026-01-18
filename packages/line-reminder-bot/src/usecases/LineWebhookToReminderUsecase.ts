@@ -22,10 +22,12 @@ export async function createReminderFromLine(vo: {
 }): Promise<void> {
 	const { message, userId, replyToken, env } = vo;
 	const { trimmed, results } = await saveReminderToDB({ message, userId, env });
+
 	let responseMessage = '✅ リマインド登録\n\n';
 	responseMessage += `📝 ${trimmed}\n\n`;
 	responseMessage += '📅 通知予定:\n';
 	responseMessage += results.map((r) => `・ ${r}`).join('\n');
+
 	await sendReplyToLine(replyToken, responseMessage, env.LINE_CHANNEL_TOKEN);
 }
 
@@ -36,7 +38,9 @@ export async function deleteReminderFromLine(vo: {
 	env: Record<string, any>;
 }): Promise<void> {
 	const { groupId, userId, replyToken, env } = vo;
+
 	await deleteRemindersByGroupId(env.DB, groupId, userId);
+
 	await sendReplyToLine(replyToken, '✅ リマインドを削除しました。', env.LINE_CHANNEL_TOKEN);
 }
 
