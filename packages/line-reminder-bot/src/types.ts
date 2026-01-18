@@ -1,11 +1,4 @@
-import { LineWebhookEvent } from '@shared/line';
-
-export interface Env {
-	DB: D1Database;
-	LINE_CHANNEL_TOKEN: string;
-	LINE_CHANNEL_SECRET: string;
-	LINE_OWN_USER_ID: string;
-}
+import { LineWebhookEvent } from '@shared/line/types';
 
 export interface Reminder {
 	id: string;

@@ -15,7 +15,7 @@ interface EnvVars {
  * 環境変数を取得して検証する
  * @returns 検証済みの環境変数オブジェクトと不足している変数名の配列
  */
-export function getValidatedEnv(env: Record<string, string>): { ENV: EnvVars; missingVars: string[] } {
+export function getValidatedEnv(env: Record<string, any>): { ENV: EnvVars; missingVars: string[] } {
 	const ENV = {
 		GITHUB_TOKEN: env.GITHUB_TOKEN,
 		OWNER: env.GITHUB_REPO_OWNER,
@@ -37,7 +37,7 @@ export function getValidatedEnv(env: Record<string, string>): { ENV: EnvVars; mi
  * 環境変数が正しく設定されているか確認する
  * @returns 環境変数が正しく設定されていない場合はエラーレスポンスを返す、正しく設定されている場合はnullを返す
  */
-export function validateEnv(env: Record<string, string>): Response | null {
+export function validateEnv(env: Record<string, any>): Response | null {
 	const { ENV, missingVars } = getValidatedEnv(env);
 
 	if (missingVars.length > 0) {

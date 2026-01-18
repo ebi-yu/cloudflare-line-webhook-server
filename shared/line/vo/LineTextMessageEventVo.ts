@@ -1,7 +1,9 @@
-export class LineMessageEvent {
+import { ServerErrorException } from '../../utils/ServerErrorException';
+
+export class LineTextMessageEventVo {
 	private constructor(public readonly message: string, public readonly userId: string, public readonly replyToken: string) {}
 
-	static create(params: { message?: string; userId?: string; replyToken?: string }): LineMessageEvent {
+	static create(params: { message?: string; userId?: string; replyToken?: string }): LineTextMessageEventVo {
 		const errors: string[] = [];
 
 		if (!params.message || params.message.trim() === '') {
@@ -15,16 +17,9 @@ export class LineMessageEvent {
 		}
 
 		if (errors.length > 0) {
-			throw new LineMessageEventError('Invalid message event data', errors);
+			throw new ServerErrorException('Invalid message event data', 400, errors);
 		}
 
-		return new LineMessageEvent(params.message!, params.userId!, params.replyToken!);
-	}
-}
-
-export class LineMessageEventError extends Error {
-	constructor(message: string, public readonly errors: string[]) {
-		super(message);
-		this.name = 'LineMessageEventError';
+		return new LineTextMessageEventVo(params.message!, params.userId!, params.replyToken!);
 	}
 }

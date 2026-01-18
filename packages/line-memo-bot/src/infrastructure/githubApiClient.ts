@@ -1,5 +1,5 @@
+import { ServerErrorException } from '@shared/utils/ServerErrorException';
 import { utf8ToBase64 } from '../utils/base64';
-import { InternalServerError } from '../utils/error';
 
 /**
  * Githubにファイル作成リクエストを送信
@@ -37,13 +37,10 @@ export async function sendFileCreateRequestToGithub(params: GitHubFileCreatePara
 	try {
 		const res = await fetch(repoUrl, requestOptions);
 		if (res.status !== 201) {
-			throw new InternalServerError('Failed to create file to github repository', { status: res.status });
+			throw new ServerErrorException('Failed to create file to github repository', 500);
 		}
 	} catch (err) {
-		if (err instanceof InternalServerError) {
-			throw err;
-		}
-		throw new InternalServerError('Error sending request to GitHub', err);
+		throw new ServerErrorException('Error sending request to GitHub', 500);
 	}
 }
 

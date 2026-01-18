@@ -1,11 +1,13 @@
-export class LineWebhookConfig {
+import { ServerErrorException } from '../../utils/ServerErrorException';
+
+export class LineWebhookConfigVo {
 	private constructor(
 		public readonly channelSecret: string,
 		public readonly channelToken: string,
 		public readonly allowedUserId?: string
 	) {}
 
-	static create(params: { channelSecret?: string; channelToken?: string; allowedUserId?: string }): LineWebhookConfig {
+	static create(params: { channelSecret?: string; channelToken?: string; allowedUserId?: string }): LineWebhookConfigVo {
 		const errors: string[] = [];
 
 		if (!params.channelSecret) {
@@ -16,10 +18,10 @@ export class LineWebhookConfig {
 		}
 
 		if (errors.length > 0) {
-			throw new LineWebhookConfigError('Invalid webhook config', errors);
+			throw new ServerErrorException('Invalid webhook config', 400, errors);
 		}
 
-		return new LineWebhookConfig(params.channelSecret!, params.channelToken!, params.allowedUserId);
+		return new LineWebhookConfigVo(params.channelSecret!, params.channelToken!, params.allowedUserId);
 	}
 
 	isAllowedUser(userId: string): boolean {
@@ -27,12 +29,5 @@ export class LineWebhookConfig {
 			return true;
 		}
 		return userId === this.allowedUserId;
-	}
-}
-
-export class LineWebhookConfigError extends Error {
-	constructor(message: string, public readonly errors: string[]) {
-		super(message);
-		this.name = 'LineWebhookConfigError';
 	}
 }

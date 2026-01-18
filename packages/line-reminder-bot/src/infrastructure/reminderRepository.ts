@@ -67,6 +67,12 @@ export async function deleteReminder(db: D1Database, id: string, userId: string)
 	return result.success && (result.meta?.changes || 0) > 0;
 }
 
+export async function deleteRemindersByGroupId(db: D1Database, groupId: string, userId: string): Promise<number> {
+	const result = await db.prepare(`DELETE FROM reminders WHERE group_id = ? AND user_id = ?`).bind(groupId, userId).run();
+
+	return result.meta?.changes || 0;
+}
+
 /**
  * 実行すべきリマインダーを取得（現在時刻以前のもの）
  */
