@@ -3,14 +3,16 @@ import { sendFileCreateRequestToGithub } from '../infrastructure/githubApiClient
 
 export async function recordMemoFromLine(vo: { message: string; replyToken: string; env: Record<string, any> }): Promise<void> {
 	const { message, replyToken, env } = vo;
-	const responseMessage = await saveMessageToGithub({ message, env });
+	await saveMessageToGithub({ message, env });
+
+	const responseMessage = `✅ メモをGitHubに保存しました。\n\n${message}`;
 	await sendReplyToLine(replyToken, responseMessage, env.LINE_CHANNEL_TOKEN);
 }
 
 /**
  * メッセージをGitHubに保存する処理
  */
-async function saveMessageToGithub(vo: { message: string; env: Record<string, any> }): Promise<string> {
+async function saveMessageToGithub(vo: { message: string; env: Record<string, any> }): Promise<void> {
 	const { message, env } = vo;
 	// 環境変数の取得
 	const ENV = {
@@ -38,6 +40,4 @@ async function saveMessageToGithub(vo: { message: string; env: Record<string, an
 		committerName: ENV.GITHUB_COMMITTER_NAME,
 		committerEmail: ENV.GITHUB_COMMITTER_EMAIL,
 	});
-
-	return `受け取ったメッセージ: ${message}`;
 }
