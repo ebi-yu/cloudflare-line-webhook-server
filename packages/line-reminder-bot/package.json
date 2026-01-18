@@ -1,0 +1,14 @@
+{
+	"name": "line-reminder-bot",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "wrangler dev",
+		"deploy": "wrangler deploy",
+		"env:deploy": "wrangler secret put LINE_CHANNEL_TOKEN && wrangler secret put LINE_CHANNEL_SECRET && wrangler secret put LINE_OWN_USER_ID",
+		"d1:create": "wrangler d1 create line-reminder-db",
+		"d1:migrations:apply": "wrangler d1 migrations apply line-reminder-db --remote",
+		"d1:migrations:apply:local": "wrangler d1 migrations apply line-reminder-db --local"
+	}
+}

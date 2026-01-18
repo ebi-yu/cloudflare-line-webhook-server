@@ -1,6 +1,6 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "polished-boat-baf3",
+	"name": "line-memo-bot",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-03-13",
 	"observability": {

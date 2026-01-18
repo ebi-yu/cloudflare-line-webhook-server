@@ -1,0 +1,23 @@
+### LINE Webhook Test (ローカル開発)
+POST http://localhost:8787
+Content-Type: application/json
+X-Line-Signature: I0nDpAtl2f6fH8ngTR2pmXMhULVTQCnaQLC5+mKtUr4=
+
+{
+  "events": [
+    {
+      "type": "message",
+      "replyToken": "test-reply-token",
+      "source": {
+        "userId": "YOUR_LINE_USER_ID",
+        "type": "user"
+      },
+      "message": {
+        "type": "text",
+        "text": "水を飲む"
+      },
+      "timestamp": 1234567890123
+    }
+  ]
+}
+

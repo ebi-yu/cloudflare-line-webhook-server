@@ -1,0 +1,19 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "line-reminder-bot",
+	"main": "src/index.ts",
+	"compatibility_date": "2025-03-13",
+	"observability": {
+		"enabled": true
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "line-reminder-db",
+			"database_id": "8390e640-3e78-44ca-9aa5-410fe264d7be"
+		}
+	],
+	"triggers": {
+		"crons": ["*/5 * * * *"]
+	}
+}

@@ -1,21 +1,21 @@
 // LINE Webhookのイベント全体
 export interface LineWebhookEvent {
-	destination: string;
-	events: LineEvent[];
+	destination?: string;
+	events?: LineEvent[];
 }
 
 // 各イベント
 export interface LineEvent {
-	replyToken: string;
+	replyToken?: string;
 	type: string;
-	mode: string;
-	timestamp: number;
-	source: LineEventSource;
-	webhookEventId: string;
-	deliveryContext: {
+	mode?: string;
+	timestamp?: number;
+	source?: LineEventSource;
+	webhookEventId?: string;
+	deliveryContext?: {
 		isRedelivery: boolean;
 	};
-	message: LineMessage;
+	message?: LineMessage;
 }
 
 // メッセージの送信元情報
@@ -26,10 +26,10 @@ export type LineEventSource =
 
 // メッセージの型
 export interface LineMessage {
-	id: string;
+	id?: string;
 	type: string;
 	quoteToken?: string;
-	text: string;
+	text?: string;
 	emojis?: LineEmoji[];
 	mention?: LineMention;
 }
@@ -51,7 +51,6 @@ export interface LineMention {
 export interface LineMentionee {
 	index: number;
 	length: number;
-	type: string;
+	type?: string;
 	userId?: string;
-	isSelf?: boolean;
 }

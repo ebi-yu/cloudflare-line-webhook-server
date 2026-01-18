@@ -1,6 +1,5 @@
-import { utf8ToBase64 } from '../../utils/base64';
-import { InternalServerError } from '../../utils/error';
-import { GitHubFileCreateParams } from './types';
+import { utf8ToBase64 } from '../utils/base64';
+import { InternalServerError } from '../utils/error';
 
 /**
  * Githubにファイル作成リクエストを送信
@@ -46,4 +45,22 @@ export async function sendFileCreateRequestToGithub(params: GitHubFileCreatePara
 		}
 		throw new InternalServerError('Error sending request to GitHub', err);
 	}
+}
+
+// GitHub API リクエスト用の型定義
+export interface GitHubFileCreateParams {
+	path: string;
+	owner: string;
+	repoName: string;
+	githubToken: string;
+	message: string;
+	committerName?: string;
+	committerEmail?: string;
+}
+
+// GitHub API レスポンス用の型定義
+export interface GitHubApiResponse {
+	status: number;
+	data?: any;
+	error?: string;
 }
