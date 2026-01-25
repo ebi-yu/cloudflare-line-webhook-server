@@ -1,4 +1,4 @@
-import { ServerErrorException } from '../../utils/ServerErrorException';
+import { ServerErrorException } from '../../../../utils/ServerErrorException';
 
 export class LineTextMessageEventVo {
 	private constructor(public readonly message: string, public readonly userId: string, public readonly replyToken: string) {}

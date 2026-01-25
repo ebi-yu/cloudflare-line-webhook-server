@@ -1,4 +1,4 @@
-import { ServerErrorException } from '../../utils/ServerErrorException';
+import { ServerErrorException } from '../../../utils/ServerErrorException';
 
 /**
  * LINEのメッセージに返信

@@ -1,6 +1,6 @@
-import { ServerErrorException } from '../../utils/ServerErrorException';
+import { ServerErrorException } from '../../../utils/ServerErrorException';
 import { sendReplyToLine } from '../infrastructure/lineApiClient';
-import { LineWebhookConfigVo } from '../vo/LineWebhookConfigVo';
+import { LineWebhookConfigVo } from '../infrastructure/vo/LineWebhookConfigVo';
 
 /**
  * ユーザー認証を行い、未認証の場合は例外を投げる
