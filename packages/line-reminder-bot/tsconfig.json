@@ -1,16 +1,6 @@
 {
+	"extends": "../../tsconfig.json",
 	"compilerOptions": {
-		"target": "ES2022",
-		"module": "ES2022",
-		"lib": ["ES2022"],
-		"types": ["@cloudflare/workers-types"],
-		"moduleResolution": "bundler",
-		"strict": true,
-		"skipLibCheck": true,
-		"noEmit": true,
-		"esModuleInterop": true,
-		"forceConsistentCasingInFileNames": true,
-		"resolveJsonModule": true,
 		"paths": {
 			"@shared/*": ["../../shared/*"]
 		}

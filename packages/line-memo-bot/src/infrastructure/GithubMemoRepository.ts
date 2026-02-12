@@ -1,5 +1,5 @@
 import { Memo } from '../domain/entity/Memo';
-import { MemoRepository } from '../domain/repository/MemoRepository';
+import { IMemoRepository } from '../domain/interface/IMemoRepository';
 import { sendFileCreateRequestToGithub } from './GithubApiClient';
 import { GitHubConfigVo } from './vo/GitHubConfigVo';
 import { GitHubFileCreateRequestVo } from './vo/GitHubFileCreateRequestVo';
@@ -7,7 +7,7 @@ import { GitHubFileCreateRequestVo } from './vo/GitHubFileCreateRequestVo';
 /**
  * GitHubを使ったメモリポジトリの実装
  */
-export class GithubMemoRepository implements MemoRepository {
+export class GithubMemoRepository implements IMemoRepository {
 	constructor(private readonly config: GitHubConfigVo) {}
 
 	async save(memo: Memo): Promise<void> {

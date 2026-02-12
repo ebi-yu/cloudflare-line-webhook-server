@@ -1,13 +1,15 @@
-# 重要なルール
+# 依存の方向性について
 
-- infrastructure/usecase/voにコードを振り分けて実装する
-  - `infrastructure`：外部サービスとのやりとりを担当するコード
-  - `usecase`：ビジネスロジックを担当するコード
-  - `vo`：値オブジェクト（Value Object）を定義するコード
-  - `src/index.ts`：Cloudflare Workersのエントリーポイントとして機能する。リクエストパラメータのバリデーションとルーティングはここで行う
+DDDにおける依存の方向性に従います
 
-## エラー処理について
+```md
+index.ts (アプリケーションのエントリーポイント)
+ ↓
+application/* (ユースケース層)
+ ↓
+domain/* (ドメイン層)
+ ↑
+infrastructure/* (インフラ層)
+```
 
-- `ServerErrorException`を使用してエラーをスローする
-- new Responseは必ず、`src/index.ts`で行う。他の箇所でnew Responseを使用しないこと
-- エラーのハンドリングは`src/index.ts`で行うこと
+- domain層ではinterfaceを定義し、infrastructure層でそのinterfaceを実装します
