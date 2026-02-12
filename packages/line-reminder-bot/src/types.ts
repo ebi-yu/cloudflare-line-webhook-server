@@ -1,4 +1,4 @@
-import { LineWebhookEvent } from '@shared/line/types';
+import { LineWebhookEvent } from '@shared/domain/line/types';
 
 export interface Reminder {
 	id: string;

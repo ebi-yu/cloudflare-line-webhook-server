@@ -1,4 +1,4 @@
-import { sendReplyToLine } from '@shared/line/infrastructure/lineApiClient';
+import { sendReplyToLine } from '@shared/domain/line/infrastructure/lineApiClient';
 import { createReminder, deleteRemindersByGroupId } from '../infrastructure/reminderRepository';
 import { ReminderInput } from '../types';
 

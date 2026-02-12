@@ -1,4 +1,4 @@
-import { sendPushMessage } from '@shared/line/infrastructure/lineApiClient';
+import { sendPushMessage } from '@shared/domain/line/infrastructure/lineApiClient';
 import { deleteReminder, getDueReminders } from '../infrastructure/reminderRepository';
 
 /**

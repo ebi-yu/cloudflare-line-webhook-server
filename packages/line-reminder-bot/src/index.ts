@@ -1,8 +1,8 @@
-import { isPostbackEvent, isTextMessageEvent, LineWebhookValidator } from '@shared/line/infrastructure/lineWebhookValidator';
-import { checkUserAuthorization } from '@shared/line/usecase/checkUserAuthorization';
-import { LinePostbackDeleteReminderEventVo } from '@shared/line/vo/LinePostbackDeleteReminderEventVo';
-import { LineTextMessageEventVo } from '@shared/line/vo/LineTextMessageEventVo';
-import { LineWebhookConfigVo } from '@shared/line/vo/LineWebhookConfigVo';
+import { checkUserAuthorization } from '@shared/domain/line/application/checkUserAuthorization';
+import { isPostbackEvent, isTextMessageEvent, LineWebhookValidator } from '@shared/domain/line/infrastructure/lineWebhookValidator';
+import { LinePostbackDeleteReminderEventVo } from '@shared/domain/line/infrastructure/vo/LinePostbackDeleteReminderEventVo';
+import { LineTextMessageEventVo } from '@shared/domain/line/infrastructure/vo/LineTextMessageEventVo';
+import { LineWebhookConfigVo } from '@shared/domain/line/infrastructure/vo/LineWebhookConfigVo';
 import { ServerErrorException } from '@shared/utils/ServerErrorException';
 import { createReminderFromLine, deleteReminderFromLine } from './usecases/LineWebhookToReminderUsecase';
 import { processScheduledReminders } from './usecases/scheduledReminderUsecase';
@@ -80,7 +80,7 @@ export default {
 					{
 						status: error.statusCode,
 						headers: { 'Content-Type': 'application/json' },
-					}
+					},
 				);
 			}
 			return new Response('Internal Server Error', { status: 500 });

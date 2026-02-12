@@ -1,8 +1,8 @@
-import { sendReplyToLine } from '@shared/line/infrastructure/lineApiClient';
-import { isTextMessageEvent, LineWebhookValidator } from '@shared/line/infrastructure/lineWebhookValidator';
-import { checkUserAuthorization } from '@shared/line/usecase/checkUserAuthorization';
-import { LineTextMessageEventVo } from '@shared/line/vo/LineTextMessageEventVo';
-import { LineWebhookConfigVo } from '@shared/line/vo/LineWebhookConfigVo';
+import { sendReplyToLine } from '@shared/domain/line/infrastructure/lineApiClient';
+import { isTextMessageEvent, LineWebhookValidator } from '@shared/domain/line/infrastructure/lineWebhookValidator';
+import { checkUserAuthorization } from '@shared/domain/line/usecase/checkUserAuthorization';
+import { LineTextMessageEventVo } from '@shared/domain/line/vo/LineTextMessageEventVo';
+import { LineWebhookConfigVo } from '@shared/domain/line/vo/LineWebhookConfigVo';
 import { ServerErrorException } from '@shared/utils/ServerErrorException';
 import { recordMemoFromLine } from './application/LineWebhookToGithubUsecase';
 import { GithubMemoRepository } from './infrastructure/GithubMemoRepository';
@@ -73,7 +73,7 @@ export default {
 					{
 						status: error.statusCode,
 						headers: { 'Content-Type': 'application/json' },
-					}
+					},
 				);
 			}
 			return new Response('Internal Server Error', { status: 500 });
