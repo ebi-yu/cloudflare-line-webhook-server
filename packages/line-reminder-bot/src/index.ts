@@ -4,7 +4,7 @@ import { LinePostbackDeleteReminderEventVo } from '@shared/domain/line/infrastru
 import { LineTextMessageEventVo } from '@shared/domain/line/infrastructure/vo/LineTextMessageEventVo';
 import { LineWebhookConfigVo } from '@shared/domain/line/infrastructure/vo/LineWebhookConfigVo';
 import { ServerErrorException } from '@shared/utils/ServerErrorException';
-import { createReminderFromLine, deleteReminderFromLine } from './usecases/LineWebhookToReminderUsecase';
+import { createReminderFromLine, deleteReminderFromLine } from './usecases/lineWebhookToReminderUsecase';
 import { processScheduledReminders } from './usecases/scheduledReminderUsecase';
 
 // リクエストデータの検証とビジネスロジックの呼び出し
