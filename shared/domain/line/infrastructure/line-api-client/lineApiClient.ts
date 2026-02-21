@@ -54,6 +54,34 @@ export async function sendTextMessage(
 }
 
 /**
+ * LINEのFlexメッセージに返信
+ */
+export async function sendReplyFlexMessage(replyToken: string, altText: string, flexContainer: FlexContainer, accessToken: string): Promise<void> {
+	const response = await fetch('https://api.line.me/v2/bot/message/reply', {
+		method: 'POST',
+		headers: {
+			Authorization: `Bearer ${accessToken}`,
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({
+			replyToken,
+			messages: [
+				{
+					type: 'flex',
+					altText,
+					contents: flexContainer,
+				},
+			],
+		}),
+	});
+
+	if (!response.ok) {
+		const errorText = await response.text();
+		throw new ServerErrorException(`Failed to send reply flex message: ${response.status} - ${errorText}`);
+	}
+}
+
+/**
  * LINEにFlexメッセージを送信（プッシュ）
  */
 export async function sendFlexMessage(userId: string, altText: string, flexContainer: FlexContainer, accessToken: string): Promise<void> {

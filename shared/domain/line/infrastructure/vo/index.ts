@@ -7,6 +7,7 @@ export { LineWebhookSignatureVo } from './webhook/LineWebhookSignatureVo';
 
 // Postback関連のVO
 export { LinePostbackDeleteReminderVo } from './postback/LinePostbackDeleteReminderVo';
+export { LinePostbackShowReminderListVo } from './postback/LinePostbackShowReminderListVo';
 export { LinePostbackVo } from './postback/LinePostbackVo';
 export type { LinePostback, LinePostbackEvent } from './postback/LinePostbackVo';
 

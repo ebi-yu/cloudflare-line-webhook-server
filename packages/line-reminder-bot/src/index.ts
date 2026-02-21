@@ -1,9 +1,10 @@
 import { checkUserAuthorization } from '@shared/domain/line/application/checkUserAuthorization';
 import { LineWebhookConfigVo, LineWebhookRequestVo } from '@shared/domain/line/infrastructure/vo';
 import { LinePostbackDeleteReminderVo } from '@shared/domain/line/infrastructure/vo/postback/LinePostbackDeleteReminderVo';
+import { LinePostbackShowReminderListVo } from '@shared/domain/line/infrastructure/vo/postback/LinePostbackShowReminderListVo';
 import { LineWebhookMessageVo } from '@shared/domain/line/infrastructure/vo/webhook/LineWebhookMessageVo';
 import { ServerErrorException } from '@shared/utils/ServerErrorException';
-import { createReminderFromLine, deleteReminderFromLine } from './usecases/lineWebhookToReminderUsecase';
+import { createReminderFromLine, deleteReminderFromLine, showReminderListFromLine } from './usecases/LineWebhookToReminderUsecase';
 import { processScheduledReminders } from './usecases/scheduledReminderUsecase';
 
 // リクエストデータの検証とビジネスロジックの呼び出し
@@ -48,24 +49,54 @@ export default {
 				return new Response('OK', { status: 200 });
 			}
 
-			// レマインダーの削除
+			// レマインダーの削除・一覧表示
 			if (LineWebhookRequestVo.isPostbackEvent(event)) {
-				// 4. LinePostbackDeleteReminderVoへの変換
-				const postBackEvent = LinePostbackDeleteReminderVo.create({
-					data: event.postback!.data,
-					userId: event.source?.userId,
-					replyToken: event.replyToken,
-				});
+				const parsedParams = new URLSearchParams(event.postback!.data);
 
-				// 5. ビジネスロジック実行
-				await deleteReminderFromLine({
-					groupId: postBackEvent.groupId || '',
-					userId: postBackEvent.userId || '',
-					replyToken: postBackEvent.replyToken,
-					env,
-				});
+				// リマインダー一覧表示
+				if (parsedParams.get('type') === 'list') {
+					const postBackEvent = LinePostbackShowReminderListVo.create({
+						data: event.postback!.data,
+						userId: event.source?.userId,
+						replyToken: event.replyToken,
+					});
 
-				return new Response('OK', { status: 200 });
+					// ユーザー認証
+					await checkUserAuthorization({
+						userId: postBackEvent.userId,
+						replyToken: postBackEvent.replyToken,
+						config,
+					});
+
+					// ビジネスロジック実行
+					await showReminderListFromLine({
+						userId: postBackEvent.userId,
+						replyToken: postBackEvent.replyToken,
+						env,
+					});
+
+					return new Response('OK', { status: 200 });
+				}
+
+				// レマインダーの削除
+				if (parsedParams.get('type') === 'delete') {
+					// 4. LinePostbackDeleteReminderVoへの変換
+					const postBackEvent = LinePostbackDeleteReminderVo.create({
+						data: event.postback!.data,
+						userId: event.source?.userId,
+						replyToken: event.replyToken,
+					});
+
+					// 5. ビジネスロジック実行
+					await deleteReminderFromLine({
+						groupId: postBackEvent.groupId || '',
+						userId: postBackEvent.userId || '',
+						replyToken: postBackEvent.replyToken,
+						env,
+					});
+
+					return new Response('OK', { status: 200 });
+				}
 			}
 
 			throw new ServerErrorException('Unsupported event type', 400);
