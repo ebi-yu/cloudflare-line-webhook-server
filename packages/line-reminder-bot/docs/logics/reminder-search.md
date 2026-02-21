@@ -9,28 +9,12 @@
 - **ファイル**: [src/index.ts](../src/index.ts)
 - **関数**: `fetch()` ハンドラー
 - **トリガー**: LINE Messaging APIからのWebhook（テキストメッセージイベント）
-- **判定条件**: メッセージが「検索 」「search 」で始まる
-
-```typescript
-if (isTextMessageEvent(event)) {
-  const message = event.message.text.trim();
-
-  if (message.startsWith('検索 ') || message.toLowerCase().startsWith('search ')) {
-    const keyword = message.replace(/^(検索|search)\s+/i, '');
-
-    await searchReminders({
-      userId: messageEvent.userId,
-      keyword,
-      replyToken: messageEvent.replyToken,
-      env,
-    });
-  }
-}
-```
+- **判定条件**: メッセージが「検索 」「search 」で始まる（大文字小文字区別なし）
+- **キーワード抽出**: コマンド部分（「検索 」「search 」）を除去した残りの文字列
 
 ## データフロー
 
-```
+```text
 User (LINE)
   │
   │ 1. メッセージ送信 ("検索 水")
@@ -53,10 +37,7 @@ reminderSearchUsecase.ts
   ▼
 D1 Database
   │
-  │ 5. SELECT * FROM reminders
-  │    WHERE user_id = ?
-  │    AND message LIKE '%keyword%'
-  │    ORDER BY execution_time ASC
+  │ 5. ユーザーのリマインダーをキーワードで部分一致検索
   ▼
 reminderSearchUsecase.ts
   │
@@ -80,16 +61,14 @@ User (LINE)
 **責務**: キーワードでリマインダーを検索して表示
 
 **パラメータ**:
-```typescript
-{
-  userId: string;       // LINEユーザーID
-  keyword: string;      // 検索キーワード
-  replyToken: string;   // LINE返信用トークン
-  env: Record<string, any>; // 環境変数
-}
-```
+
+- `userId`: LINEユーザーID
+- `keyword`: 検索キーワード
+- `replyToken`: LINE返信用トークン
+- `env`: 環境変数
 
 **処理内容**:
+
 1. キーワードが空の場合、エラーメッセージを返信
 2. `searchRemindersByKeyword()`で検索実行
 3. 検索結果が0件の場合、「見つかりませんでした」を返信
@@ -103,21 +82,12 @@ User (LINE)
 **責務**: メッセージ内容でリマインダーを部分一致検索
 
 **パラメータ**:
-```typescript
-db: D1Database
-userId: string
-keyword: string
-```
 
-**SQL**:
-```sql
-SELECT * FROM reminders
-WHERE user_id = ?
-AND message LIKE ?
-ORDER BY execution_time ASC
-```
+- `db`: D1データベースインスタンス
+- `userId`: LINEユーザーID
+- `keyword`: 検索キーワード
 
-**LIKE パターン**: `'%' + keyword + '%'` (前後に%を付けて部分一致)
+`user_id`と`message`の部分一致で検索し、`execution_time`の昇順で返す。
 
 **戻り値**: `Promise<Reminder[]>`
 
@@ -128,12 +98,14 @@ ORDER BY execution_time ASC
 **責務**: 検索結果を表示用のテキストに整形
 
 **処理内容**:
+
 1. ヘッダー作成: `🔍 検索結果: "キーワード" (N件)`
 2. 各リマインダーをループ（一覧表示と同じフォーマット）
 3. キーワードを強調表示（可能であれば）
 
 **出力例**:
-```
+
+```text
 🔍 検索結果: "水" (5件)
 
 ID: f47ac10b
@@ -162,37 +134,37 @@ ID: a1b2c3d4
 - 空キーワードの場合はエラー
 
 **例**:
-- 入力: `検索 水`
-- キーワード: `水`
-- 入力: `search water`
-- キーワード: `water`
+
+- 入力: `検索 水` → キーワード: `水`
+- 入力: `search water` → キーワード: `water`
 
 ### 2. 部分一致検索
 
-- SQLの `LIKE` 演算子を使用
 - 前後に `%` を付けて部分一致
 - 大文字小文字の区別はSQLiteの設定に依存（デフォルトは区別しない）
 
 **マッチ例**:
+
 - キーワード: `水`
 - マッチ: `水を飲む`, `水やり`, `薬と水`
 
 ### 3. 特殊文字のエスケープ
 
 SQLiteの `LIKE` で特殊な意味を持つ文字:
+
 - `%`: 任意の文字列
 - `_`: 任意の1文字
 
-ユーザー入力にこれらが含まれる場合、エスケープが必要:
-- `%` → `\%`
-- `_` → `\_`
+ユーザー入力にこれらが含まれる場合、エスケープが必要。
 
 ### 4. 検索対象フィールド
 
 現在の仕様では `message` フィールドのみ検索:
+
 - `message`: リマインドメッセージ内容
 
 **拡張案**:
+
 - `interval_label` も検索対象に含める
 - 例: 「検索 1日後」で1日後のリマインダーをすべて取得
 
@@ -204,17 +176,18 @@ SQLiteの `LIKE` で特殊な意味を持つ文字:
 ### 6. 検索パフォーマンス
 
 - `message` フィールドには現在インデックスなし
-- `LIKE '%keyword%'` はフルテーブルスキャンになる可能性
+- 前方一致でないLIKE検索はフルテーブルスキャンになる可能性
 - ユーザーごとのリマインダー数が多い場合、パフォーマンスに影響
 
 **対策案**:
+
 - FTS (Full-Text Search) の導入
-- `message` フィールドに専用のFTSテーブルを作成
 
 ### 7. 空キーワード対応
 
 キーワードが空の場合のエラーメッセージ:
-```
+
+```text
 ❌ 検索キーワードを入力してください。
 
 使い方:
@@ -229,7 +202,8 @@ search water
 ### 8. 検索結果0件
 
 該当リマインダーがない場合:
-```
+
+```text
 🔍 検索結果: "キーワード" (0件)
 
 該当するリマインダーが見つかりませんでした。
@@ -240,12 +214,13 @@ search water
 ### 9. 複数キーワード検索
 
 現在の仕様では単一キーワードのみ:
+
 - 入力: `検索 水 薬`
 - キーワード: `水 薬` (スペース含む文字列として検索)
 
 **拡張案**:
+
 - スペース区切りで複数キーワードをAND検索
-- 例: `検索 水 薬` → `message LIKE '%水%' AND message LIKE '%薬%'`
 
 ### 10. 日本語・英語対応
 
@@ -254,21 +229,8 @@ search water
 
 ### 11. インデックスの追加検討
 
-検索頻度が高い場合、`message` にインデックス追加を検討:
-
-**通常のインデックス** (部分一致には効果薄):
-```sql
-CREATE INDEX idx_reminders_message ON reminders(message);
-```
-
-**FTS (Full-Text Search)** (推奨):
-```sql
-CREATE VIRTUAL TABLE reminders_fts USING fts5(
-  message,
-  content=reminders,
-  content_rowid=rowid
-);
-```
+- 検索頻度が高い場合、`message` へのFTS（Full-Text Search）インデックス追加を検討
+- 通常のインデックスは前方一致のみ有効で、中間一致には効果が薄い
 
 ### 12. コマンド判定の優先順位
 

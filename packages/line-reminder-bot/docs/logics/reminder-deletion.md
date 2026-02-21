@@ -9,21 +9,11 @@
 - **ファイル**: [src/index.ts](../src/index.ts)
 - **関数**: `fetch()` ハンドラー
 - **トリガー**: LINE Messaging APIからのWebhook（Postbackイベント）
-
-```typescript
-if (isPostbackEvent(event)) {
-  await deleteReminderFromLine({
-    groupId: postBackEvent.groupId || '',
-    userId: postBackEvent.userId || '',
-    replyToken: postBackEvent.replyToken,
-    env,
-  });
-}
-```
+- **判定条件**: Postbackイベントを検出した場合、`deleteReminderFromLine()` を呼び出す
 
 ## データフロー
 
-```
+```text
 User (LINE)
   │
   │ 1. クイックリプライボタンをタップ
@@ -50,8 +40,7 @@ lineWebhookToReminderUsecase.ts
   ▼
 D1 Database
   │
-  │ 6. DELETE FROM reminders
-  │    WHERE group_id = ? AND user_id = ?
+  │ 6. groupIdとuserIdでリマインダーを一括削除
   ▼
 LINE API (Reply Message)
   │
@@ -69,16 +58,14 @@ User (LINE)
 **責務**: リマインダーグループを削除してLINEに返信
 
 **パラメータ**:
-```typescript
-{
-  groupId: string;      // リマインダーグループID
-  userId: string;       // LINEユーザーID
-  replyToken: string;   // LINE返信用トークン
-  env: Record<string, any>; // 環境変数
-}
-```
+
+- `groupId`: リマインダーグループID
+- `userId`: LINEユーザーID
+- `replyToken`: LINE返信用トークン
+- `env`: 環境変数
 
 **処理内容**:
+
 1. `deleteRemindersByGroupId()`で一括削除
 2. `sendReplyToLine()`で削除完了メッセージを返信
 
@@ -89,19 +76,14 @@ User (LINE)
 **責務**: 指定したgroupIdに属する全てのリマインダーを削除
 
 **パラメータ**:
-```typescript
-db: D1Database
-groupId: string
-userId: string
-```
 
-**SQL**:
-```sql
-DELETE FROM reminders
-WHERE group_id = ? AND user_id = ?
-```
+- `db`: D1データベースインスタンス
+- `groupId`: 削除対象のグループID
+- `userId`: LINEユーザーID（セキュリティ上、所有者確認のため必須）
 
-**戻り値**: `Promise<number>` (削除されたレコード数)
+`groupId`と`user_id`の両方を条件にして削除する。
+
+**戻り値**: 削除されたレコード数
 
 ### `LinePostbackDeleteReminderEventVo.create()`
 
@@ -109,23 +91,9 @@ WHERE group_id = ? AND user_id = ?
 
 **責務**: PostbackイベントのdataパラメータからgroupIdを抽出
 
-**入力例**:
-```typescript
-{
-  data: "type=delete&groupId=f47ac10b-58cc-4372-a567-0e02b2c3d479",
-  userId: "U4af4980629...",
-  replyToken: "nHuyWiB7yP5Zw52FIkcQobQuGDXCTA"
-}
-```
+**入力**: PostbackイベントのdataパラメータとuserId、replyToken
 
-**出力**:
-```typescript
-{
-  groupId: "f47ac10b-58cc-4372-a567-0e02b2c3d479",
-  userId: "U4af4980629...",
-  replyToken: "nHuyWiB7yP5Zw52FIkcQobQuGDXCTA"
-}
-```
+**出力**: 抽出したgroupId、userId、replyToken
 
 ## 注意点
 
@@ -145,15 +113,17 @@ WHERE group_id = ? AND user_id = ?
 
 - 通知後にリマインダーは自動削除される
 - 削除ボタンをタップしても、既に削除されている可能性がある
-- その場合、`deletedCount = 0` となるが、エラーにはならない
+- その場合、削除件数が0となるが、エラーにはならない
 
 ### 4. タイミングによる挙動
 
 **ケース1**: 5分後のリマインダーが通知された直後に削除ボタンをタップ
+
 - 残り4つのリマインダー（1日後、3日後、7日後、30日後）が削除される
 
 **ケース2**: 全てのリマインダーが通知済み
-- 削除対象がなく、`deletedCount = 0`
+
+- 削除対象がなく、削除件数が0
 - それでも「✅ リマインドを削除しました。」と返信される
 
 ### 5. トランザクション
@@ -170,13 +140,8 @@ WHERE group_id = ? AND user_id = ?
 
 ### 7. Postbackデータのフォーマット
 
-現在の実装:
-```
-type=delete&groupId=f47ac10b-58cc-4372-a567-0e02b2c3d479
-```
-
-- シンプルなクエリパラメータ形式
-- `type`パラメータは現在使用されていない（将来の拡張用）
+- クエリパラメータ形式: `type=delete&groupId={UUID}`
+- `type`パラメータは将来の拡張用（現在は使用しない）
 - `groupId`のみが抽出される
 
 ### 8. クイックリプライの有効期限

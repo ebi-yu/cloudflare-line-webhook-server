@@ -2,32 +2,18 @@
 
 ## 概要
 
-ユーザーが「一覧」「list」「リスト」などのキーワードを送信すると、そのユーザーの全リマインダーを実行時刻順（近い順）に表示します。各リマインダーにはIDが表示され、後で個別操作（削除・更新）ができるようになります。
+ユーザーがそのユーザーの全リマインダーを実行時刻順（近い順）に表示します。各リマインダーにはIDが表示され、後で個別操作（削除・更新）ができるようになります。
 
 ## エントリーポイント
 
 - **ファイル**: [src/index.ts](../src/index.ts)
 - **関数**: `fetch()` ハンドラー
 - **トリガー**: LINE Messaging APIからのWebhook（テキストメッセージイベント）
-- **判定条件**: メッセージが「一覧」「list」「リスト」のいずれかに一致
-
-```typescript
-if (isTextMessageEvent(event)) {
-  const message = event.message.text.trim().toLowerCase();
-
-  if (message === '一覧' || message === 'list' || message === 'リスト') {
-    await showReminderList({
-      userId: messageEvent.userId,
-      replyToken: messageEvent.replyToken,
-      env,
-    });
-  }
-}
-```
+- **判定条件**: メッセージが「一覧」「list」「リスト」のいずれかに完全一致（大文字小文字区別なし）
 
 ## データフロー
 
-```
+```text
 User (LINE)
   │
   │ 1. メッセージ送信 ("一覧")
@@ -49,9 +35,7 @@ reminderListUsecase.ts
   ▼
 D1 Database
   │
-  │ 5. SELECT * FROM reminders
-  │    WHERE user_id = ?
-  │    ORDER BY execution_time ASC
+  │ 5. ユーザーのリマインダーを実行時刻昇順で取得
   ▼
 reminderListUsecase.ts
   │
@@ -75,15 +59,13 @@ User (LINE)
 **責務**: ユーザーのリマインダー一覧を取得して表示
 
 **パラメータ**:
-```typescript
-{
-  userId: string;       // LINEユーザーID
-  replyToken: string;   // LINE返信用トークン
-  env: Record<string, any>; // 環境変数
-}
-```
+
+- `userId`: LINEユーザーID
+- `replyToken`: LINE返信用トークン
+- `env`: 環境変数
 
 **処理内容**:
+
 1. `getRemindersByUserId()`でリマインダー一覧を取得
 2. リマインダーが0件の場合、「リマインダーがありません」を返信
 3. 各リマインダーを整形:
@@ -99,12 +81,7 @@ User (LINE)
 
 **責務**: ユーザーのリマインダー一覧を取得（実行時刻昇順）
 
-**SQL**:
-```sql
-SELECT * FROM reminders
-WHERE user_id = ?
-ORDER BY execution_time ASC
-```
+`user_id`でフィルタし、`execution_time`の昇順で返す。
 
 **戻り値**: `Promise<Reminder[]>`
 
@@ -115,6 +92,7 @@ ORDER BY execution_time ASC
 **責務**: リマインダー配列を一覧表示用のテキストに整形
 
 **処理内容**:
+
 1. ヘッダー作成: `📋 あなたのリマインダー（全N件）`
 2. 各リマインダーをループ:
    - ID短縮表示: `f47ac10b...` (最初の8文字)
@@ -124,7 +102,8 @@ ORDER BY execution_time ASC
 3. フッター作成: 削除・更新方法のヘルプ
 
 **出力例**:
-```
+
+```text
 📋 あなたのリマインダー（全5件）
 
 ID: f47ac10b
@@ -154,6 +133,7 @@ ID: c3d4e5f6
 - リマインダーが多い場合、メッセージが切れる可能性
 
 **対策案**:
+
 - 件数制限（例: 最大20件まで表示）
 - ページネーション（「次へ」ボタンで続きを表示）
 - 期限が近いものだけを表示（例: 7日以内）
@@ -165,6 +145,7 @@ ID: c3d4e5f6
 - ユーザーが入力しやすい長さ
 
 **衝突リスク**:
+
 - UUIDv4の最初の8文字（32ビット）の衝突確率は非常に低い
 - 同一ユーザー内での衝突であればさらに低い
 
@@ -182,7 +163,8 @@ ID: c3d4e5f6
 ### 5. 空リスト対応
 
 リマインダーが0件の場合:
-```
+
+```text
 📋 リマインダーがありません
 
 新しいリマインダーを作成するには、
@@ -214,7 +196,8 @@ ID: c3d4e5f6
 - groupIdでグループ化して表示する選択肢もある
 
 **例（グループ化あり）**:
-```
+
+```text
 📋 水を飲む
 ├─ [5分後] 12/25 14:35 (ID: f47ac10b)
 ├─ [1日後] 12/26 14:30 (ID: b2c3d4e5)

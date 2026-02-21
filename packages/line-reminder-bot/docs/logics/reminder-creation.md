@@ -9,17 +9,7 @@ LINEユーザーがメッセージを送信すると、自動的に5つの異な
 - **ファイル**: [src/index.ts](../src/index.ts)
 - **関数**: `fetch()` ハンドラー
 - **トリガー**: LINE Messaging APIからのWebhook（テキストメッセージイベント）
-
-```typescript
-if (isTextMessageEvent(event)) {
-  await createReminderFromLine({
-    message: messageEvent.message,
-    userId: messageEvent.userId,
-    replyToken: messageEvent.replyToken,
-    env,
-  });
-}
-```
+- **判定条件**: テキストメッセージイベントを検出した場合、`createReminderFromLine()` を呼び出す
 
 ## データフロー
 
@@ -46,8 +36,7 @@ lineWebhookToReminderUsecase.ts
   ▼
 D1 Database
   │
-  │ 5. INSERT INTO reminders × 5
-  │    (groupIdで紐付け)
+  │ 5. リマインダーを5件INSERT（groupIdで紐付け）
   ▼
 LINE API (Reply Message)
   │
@@ -65,14 +54,11 @@ User (LINE)
 **責務**: LINEメッセージを受け取り、リマインダーを作成してLINEに返信
 
 **パラメータ**:
-```typescript
-{
-  message: string;      // ユーザーが送信したメッセージ
-  userId: string;       // LINEユーザーID
-  replyToken: string;   // LINE返信用トークン
-  env: Record<string, any>; // 環境変数（DB, LINE_CHANNEL_TOKENなど）
-}
-```
+
+- `message`: ユーザーが送信したメッセージ
+- `userId`: LINEユーザーID
+- `replyToken`: LINE返信用トークン
+- `env`: 環境変数（DB、LINE_CHANNEL_TOKENなど）
 
 **処理内容**:
 1. `saveReminderToDB()`で5つのリマインダーを作成
@@ -88,19 +74,8 @@ User (LINE)
 **処理内容**:
 1. メッセージをtrim
 2. `groupId`を生成（UUID）
-3. `DEFAULT_REMINDER_INTERVALS`でループ
+3. デフォルト間隔（5分後、1日後、3日後、7日後、30日後）でループ
 4. 各間隔で`createReminder()`を呼び出し
-
-**デフォルト間隔**:
-```typescript
-const DEFAULT_REMINDER_INTERVALS = [
-  { minutes: 5, label: '5分後' },
-  { minutes: 1440, label: '1日後' },    // 24 * 60
-  { minutes: 4320, label: '3日後' },    // 3 * 24 * 60
-  { minutes: 10080, label: '7日後' },   // 7 * 24 * 60
-  { minutes: 43200, label: '30日後' },  // 30 * 24 * 60
-];
-```
 
 ### `createReminder()`
 
@@ -109,16 +84,13 @@ const DEFAULT_REMINDER_INTERVALS = [
 **責務**: 単一のリマインダーをD1データベースに保存
 
 **パラメータ**:
-```typescript
-db: D1Database
-userId: string
-input: ReminderInput {
-  message: string;
-  executionTime: number;  // Unix timestamp (ms)
-  groupId?: string;
-  intervalLabel?: string;
-}
-```
+
+- `db`: D1データベースインスタンス
+- `userId`: LINEユーザーID
+- `message`: リマインドメッセージ内容
+- `executionTime`: 実行時刻（Unixタイムスタンプ、ミリ秒）
+- `groupId`: グループID（任意）
+- `intervalLabel`: 間隔ラベル（任意）
 
 **処理内容**:
 1. UUIDで`id`を生成

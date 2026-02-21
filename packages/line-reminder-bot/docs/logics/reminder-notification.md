@@ -9,16 +9,11 @@ Cloudflare Workers Cron Triggersにより5分ごとに実行され、期限が�
 - **ファイル**: [src/index.ts](../src/index.ts)
 - **関数**: `scheduled()` ハンドラー
 - **トリガー**: Cron (`*/5 * * * *` - 5分ごと)
-
-```typescript
-async scheduled(event: ScheduledEvent, env: Record<string, any>, ctx: ExecutionContext): Promise<void> {
-  ctx.waitUntil(processScheduledReminders(env));
-}
-```
+- **処理内容**: `ctx.waitUntil()` を使用して `processScheduledReminders()` を非同期実行
 
 ## データフロー
 
-```
+```text
 Cron Trigger (*/5 * * * *)
   │
   │ 1. 5分ごとに実行
@@ -35,7 +30,7 @@ scheduledReminderUsecase.ts
   ▼
 D1 Database
   │
-  │ 4. SELECT * WHERE execution_time <= now
+  │ 4. 期限到達リマインダーを取得
   │    ↓ リマインダーリスト返却
   ▼
 scheduledReminderUsecase.ts
@@ -60,11 +55,11 @@ User (LINE)
 **責務**: 期限が来たリマインダーを処理して通知
 
 **パラメータ**:
-```typescript
-env: any  // 環境変数（DB, LINE_CHANNEL_TOKENなど）
-```
+
+- `env`: 環境変数（DB、LINE_CHANNEL_TOKENなど）
 
 **処理フロー**:
+
 1. `getDueReminders()`で期限到達リマインダーを取得
 2. 各リマインダーに対してループ処理:
    - 間隔ラベルを含むメッセージを構築
@@ -77,13 +72,7 @@ env: any  // 環境変数（DB, LINE_CHANNEL_TOKENなど）
 
 **場所**: [src/infrastructure/reminderRepository.ts:79](../src/infrastructure/reminderRepository.ts#L79)
 
-**責務**: 実行時刻が現在時刻以前のリマインダーを取得
-
-**SQL**:
-```sql
-SELECT * FROM reminders
-WHERE execution_time <= ?
-```
+**責務**: 実行時刻が現在時刻以前のリマインダーをすべて取得
 
 **戻り値**: `Promise<Reminder[]>`
 
@@ -94,24 +83,17 @@ WHERE execution_time <= ?
 **責務**: LINEユーザーにプッシュメッセージを送信
 
 **パラメータ**:
-```typescript
-userId: string
-message: string
-channelToken: string
-quickReply?: object  // クイックリプライボタン
-```
+
+- `userId`: 送信先LINEユーザーID
+- `message`: 送信メッセージ内容
+- `channelToken`: LINEチャンネルアクセストークン
+- `quickReply`: クイックリプライボタン（任意）
 
 ### `deleteReminder()`
 
 **場所**: [src/infrastructure/reminderRepository.ts:64](../src/infrastructure/reminderRepository.ts#L64)
 
-**責務**: 指定したリマインダーをDBから削除
-
-**SQL**:
-```sql
-DELETE FROM reminders
-WHERE id = ? AND user_id = ?
-```
+**責務**: 指定したリマインダーをDBから削除。`id`と`user_id`の両方を条件にして削除する。
 
 ## 注意点
 
@@ -122,6 +104,7 @@ WHERE id = ? AND user_id = ?
 - **遅延**: 最大5分の遅延が発生する可能性
 
 例：
+
 - リマインダー実行予定: 14:32
 - 実際の通知時刻: 14:35（次のCron実行時）
 
@@ -130,10 +113,12 @@ WHERE id = ? AND user_id = ?
 個別のリマインダー処理はtry-catchで囲まれています。
 
 **メリット**:
+
 - 一部のリマインダーが失敗しても他は正常に送信される
 - システム全体の可用性が向上
 
 **デメリット**:
+
 - 失敗したリマインダーはDBに残り続ける
 - 次回のCron実行時に再試行される（リトライ機能として動作）
 

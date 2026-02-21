@@ -1,15 +1,14 @@
-# 依存の方向性について
+# 前提
 
-DDDにおける依存の方向性に従います
+LINE BotからWebhookイベントを受け取り、処理を実行する
 
-```md
-index.ts (アプリケーションのエントリーポイント)
- ↓
-application/* (ユースケース層)
- ↓
-domain/* (ドメイン層)
- ↑
-infrastructure/* (インフラ層)
-```
+- DB : Cloudflare D1
+- サーバ : Cloudflare Worker
+- 言語 : Typescript
+- アーキテクチャ : Domain Driven Design , TDD , Mono Repo
+- タスク管理 : Vide Kanban
 
-- domain層ではinterfaceを定義し、infrastructure層でそのinterfaceを実装します
+## サービス一覧
+
+- line-memo-bot : LINE BotのWebhookイベントを受け取り、メッセージをGithubの特定のリポジトリに保存する
+- line-remind-bot : LINE BotのWebhookイベントを受け取り、メッセージをCloudflare D1に保存し、指定した期間でリマインドする
