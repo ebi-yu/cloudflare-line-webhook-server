@@ -1,7 +1,15 @@
 import { ServerErrorException } from '../../../../../utils/ServerErrorException';
-import { LineEvent, LineWebhookEvent } from '../../../types';
+import { LineEvent } from '../../../types';
+import { LinePostbackEvent } from '../postback/LinePostbackVo';
 import { LineWebhookConfigVo } from './LineWebhookConfigVo';
+import { LineTextMessageEvent } from './LineWebhookMessageVo';
 import { LineWebhookSignatureVo } from './LineWebhookSignatureVo';
+
+// LINE Webhookのイベント全体
+export interface LineWebhookBody {
+	destination?: string;
+	events?: LineEvent[];
+}
 
 /**
  * LINE WebhookリクエストのVO
@@ -40,7 +48,7 @@ export class LineWebhookRequestVo {
 	 */
 	static create(bodyText: string): LineWebhookRequestVo {
 		try {
-			const body: LineWebhookEvent = JSON.parse(bodyText);
+			const body: LineWebhookBody = JSON.parse(bodyText);
 			const event = body.events?.[0];
 
 			if (!event) {
@@ -76,18 +84,18 @@ export class LineWebhookRequestVo {
 	getGroupId(): string | undefined {
 		return this.event.source?.type === 'group' ? this.event.source.groupId : undefined;
 	}
-}
 
-/**
- * テキストメッセージイベントかどうかを判定（ヘルパー関数）
- */
-export function isTextMessageEvent(event: LineEvent): boolean {
-	return event.type === 'message' && event.message !== undefined && event.message.type === 'text';
-}
+	/**
+	 * テキストメッセージイベントかどうかを判定（型ガード）
+	 */
+	static isTextMessageEvent(event: LineEvent): event is LineTextMessageEvent {
+		return event.type === 'message' && event.message !== undefined && event.message.type === 'text';
+	}
 
-/**
- * Postbackイベントかどうかを判定（ヘルパー関数）
- */
-export function isPostbackEvent(event: LineEvent): boolean {
-	return event.type === 'postback' && event.postback !== undefined;
+	/**
+	 * Postbackイベントかどうかを判定（型ガード）
+	 */
+	static isPostbackEvent(event: LineEvent): event is LinePostbackEvent {
+		return event.type === 'postback' && event.postback !== undefined;
+	}
 }

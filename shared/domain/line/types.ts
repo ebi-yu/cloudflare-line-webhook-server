@@ -1,9 +1,3 @@
-// LINE Webhookのイベント全体
-export interface LineWebhookEvent {
-	destination?: string;
-	events?: LineEvent[];
-}
-
 // 基本イベント型
 export interface LineEvent {
 	replyToken?: string;
@@ -48,11 +42,11 @@ export interface LineEmoji {
 
 // メンション情報
 export interface LineMention {
-	mentionees: LineMentionee[];
+	mentions: LineMention[];
 }
 
 // メンションされたユーザー
-export interface LineMentionee {
+export interface LineMention {
 	index: number;
 	length: number;
 	type?: string;

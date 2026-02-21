@@ -1,5 +1,5 @@
 import { checkUserAuthorization } from '@shared/domain/line/application/checkUserAuthorization';
-import { LineWebhookConfigVo, LineWebhookRequestVo, isPostbackEvent, isTextMessageEvent } from '@shared/domain/line/infrastructure/vo';
+import { LineWebhookConfigVo, LineWebhookRequestVo } from '@shared/domain/line/infrastructure/vo';
 import { LinePostbackDeleteReminderVo } from '@shared/domain/line/infrastructure/vo/postback/LinePostbackDeleteReminderVo';
 import { LineWebhookMessageVo } from '@shared/domain/line/infrastructure/vo/webhook/LineWebhookMessageVo';
 import { ServerErrorException } from '@shared/utils/ServerErrorException';
@@ -22,7 +22,7 @@ export default {
 			const event = webhookRequest.event;
 
 			// レマインダーの登録
-			if (isTextMessageEvent(event)) {
+			if (LineWebhookRequestVo.isTextMessageEvent(event)) {
 				// 4. LineWebhookMessageVoへの変換
 				const messageEvent = LineWebhookMessageVo.create({
 					message: event.message!.text,
@@ -49,7 +49,7 @@ export default {
 			}
 
 			// レマインダーの削除
-			if (isPostbackEvent(event)) {
+			if (LineWebhookRequestVo.isPostbackEvent(event)) {
 				// 4. LinePostbackDeleteReminderVoへの変換
 				const postBackEvent = LinePostbackDeleteReminderVo.create({
 					data: event.postback!.data,

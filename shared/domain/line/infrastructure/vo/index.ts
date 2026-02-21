@@ -2,7 +2,7 @@
 export { LineWebhookConfigVo } from './webhook/LineWebhookConfigVo';
 export { LineWebhookMessageVo } from './webhook/LineWebhookMessageVo';
 export type { LineTextMessageEvent } from './webhook/LineWebhookMessageVo';
-export { isPostbackEvent, isTextMessageEvent, LineWebhookRequestVo } from './webhook/LineWebhookRequestVo';
+export { LineWebhookRequestVo } from './webhook/LineWebhookRequestVo';
 export { LineWebhookSignatureVo } from './webhook/LineWebhookSignatureVo';
 
 // Postback関連のVO

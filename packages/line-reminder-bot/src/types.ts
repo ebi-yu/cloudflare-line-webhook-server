@@ -1,5 +1,3 @@
-import { LineWebhookEvent } from '@shared/domain/line/types';
-
 export interface Reminder {
 	id: string;
 	userId: string;
@@ -16,5 +14,3 @@ export interface ReminderInput {
 	groupId?: string;
 	intervalLabel?: string;
 }
-
-export type { LineWebhookEvent };
