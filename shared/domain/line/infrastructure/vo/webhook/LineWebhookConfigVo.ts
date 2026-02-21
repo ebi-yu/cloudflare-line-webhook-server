@@ -1,10 +1,10 @@
-import { ServerErrorException } from '../../../../utils/ServerErrorException';
+import { ServerErrorException } from '../../../../../utils/ServerErrorException';
 
 export class LineWebhookConfigVo {
 	private constructor(
 		public readonly channelSecret: string,
 		public readonly channelToken: string,
-		public readonly allowedUserId?: string
+		public readonly allowedUserId?: string,
 	) {}
 
 	static create(params: { channelSecret?: string; channelToken?: string; allowedUserId?: string }): LineWebhookConfigVo {

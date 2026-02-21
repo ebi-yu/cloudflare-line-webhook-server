@@ -108,7 +108,7 @@ User (LINE)
 2. `findReminderById()`でリマインダーを検索
 3. 該当リマインダーが存在しない場合、エラーメッセージを返信
 4. `deleteReminder()`でDBから削除
-5. `sendReplyToLine()`で削除完了メッセージを返信
+5. `sendReplyTextMessage()`で削除完了メッセージを返信
 
 ### `updateIndividualReminder()`
 
@@ -130,7 +130,7 @@ User (LINE)
 2. `findReminderById()`でリマインダーを検索
 3. 該当リマインダーが存在しない場合、エラーメッセージを返信
 4. `updateReminderMessage()`でメッセージを更新
-5. `sendReplyToLine()`で更新完了メッセージを返信
+5. `sendReplyTextMessage()`で更新完了メッセージを返信
 
 ### `findReminderById()`
 

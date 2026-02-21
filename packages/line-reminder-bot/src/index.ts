@@ -1,8 +1,7 @@
 import { checkUserAuthorization } from '@shared/domain/line/application/checkUserAuthorization';
-import { isPostbackEvent, isTextMessageEvent, LineWebhookValidator } from '@shared/domain/line/infrastructure/lineWebhookValidator';
-import { LinePostbackDeleteReminderEventVo } from '@shared/domain/line/infrastructure/vo/LinePostbackDeleteReminderEventVo';
-import { LineTextMessageEventVo } from '@shared/domain/line/infrastructure/vo/LineTextMessageEventVo';
-import { LineWebhookConfigVo } from '@shared/domain/line/infrastructure/vo/LineWebhookConfigVo';
+import { LineWebhookConfigVo, LineWebhookRequestVo, isPostbackEvent, isTextMessageEvent } from '@shared/domain/line/infrastructure/vo';
+import { LinePostbackDeleteReminderVo } from '@shared/domain/line/infrastructure/vo/postback/LinePostbackDeleteReminderVo';
+import { LineWebhookMessageVo } from '@shared/domain/line/infrastructure/vo/webhook/LineWebhookMessageVo';
 import { ServerErrorException } from '@shared/utils/ServerErrorException';
 import { createReminderFromLine, deleteReminderFromLine } from './usecases/lineWebhookToReminderUsecase';
 import { processScheduledReminders } from './usecases/scheduledReminderUsecase';
@@ -19,13 +18,14 @@ export default {
 			});
 
 			// 2. Webhook検証とイベント抽出
-			const { event } = await LineWebhookValidator.validateWebhookRequest(request, config);
+			const webhookRequest = await LineWebhookRequestVo.createFromRequest(request, config);
+			const event = webhookRequest.event;
 
 			// レマインダーの登録
 			if (isTextMessageEvent(event)) {
-				// 4. LineTextMessageEventVoへの変換
-				const messageEvent = LineTextMessageEventVo.create({
-					message: event.message.text,
+				// 4. LineWebhookMessageVoへの変換
+				const messageEvent = LineWebhookMessageVo.create({
+					message: event.message!.text,
 					userId: event.source?.userId,
 					replyToken: event.replyToken,
 				});
@@ -50,9 +50,9 @@ export default {
 
 			// レマインダーの削除
 			if (isPostbackEvent(event)) {
-				// 4. LinePostbackDeleteReminderEventVoへの変換
-				const postBackEvent = LinePostbackDeleteReminderEventVo.create({
-					data: event.postback.data,
+				// 4. LinePostbackDeleteReminderVoへの変換
+				const postBackEvent = LinePostbackDeleteReminderVo.create({
+					data: event.postback!.data,
 					userId: event.source?.userId,
 					replyToken: event.replyToken,
 				});

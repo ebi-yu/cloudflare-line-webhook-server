@@ -16,31 +16,10 @@ export interface LineEvent {
 		isRedelivery: boolean;
 	};
 	message?: LineMessage;
-	postback?: LinePostback;
-}
-
-// メッセージイベント型
-export interface LineMessageEvent extends LineEvent {
-	type: 'message';
-	message: LineMessage;
-}
-
-// テキストメッセージイベント型
-export interface LineTextMessageEventVo extends LineEvent {
-	type: 'message';
-	message: LineMessage & { type: 'text'; text: string };
-}
-
-// ポストバックイベント型
-export interface LinePostbackEvent extends LineEvent {
-	type: 'postback';
-	postback: LinePostback;
-}
-
-// Postbackの型
-export interface LinePostback {
-	data: string;
-	params?: Record<string, string>;
+	postback?: {
+		data: string;
+		params?: Record<string, string>;
+	};
 }
 
 // メッセージの送信元情報

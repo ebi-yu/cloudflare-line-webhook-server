@@ -36,7 +36,7 @@ D1 Database
 scheduledReminderUsecase.ts
   │
   │ 5. Loop: 各リマインダーに対して
-  │    ├─ sendPushMessage() - プッシュ通知
+  │    ├─ sendTextMessage() - プッシュ通知
   │    └─ deleteReminder() - DB削除
   ▼
 LINE Messaging API
@@ -64,7 +64,7 @@ User (LINE)
 2. 各リマインダーに対してループ処理:
    - 間隔ラベルを含むメッセージを構築
    - クイックリプライ（削除ボタン）を追加
-   - `sendPushMessage()`でLINEに送信
+   - `sendTextMessage()`でLINEに送信
    - `deleteReminder()`でDBから削除
 3. エラー発生時も処理を継続（個別にtry-catch）
 
@@ -76,7 +76,7 @@ User (LINE)
 
 **戻り値**: `Promise<Reminder[]>`
 
-### `sendPushMessage()`
+### `sendTextMessage()`
 
 **場所**: `@shared/domain/line/infrastructure/lineApiClient.ts`
 

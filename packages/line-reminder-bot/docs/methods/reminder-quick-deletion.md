@@ -6,94 +6,18 @@
 
 ## エントリーポイント
 
-- **ファイル**: [src/index.ts](../src/index.ts)
-- **関数**: `fetch()` ハンドラー
 - **トリガー**: LINE Messaging APIからのWebhook（Postbackイベント）
 - **判定条件**: Postbackイベントを検出した場合、`deleteReminderFromLine()` を呼び出す
 
 ## データフロー
 
-```text
-User (LINE)
-  │
-  │ 1. クイックリプライボタンをタップ
-  │    「リマインド削除」
-  ▼
-LINE Messaging API
-  │
-  │ 2. Webhook POST (Postback Event)
-  │    data: "type=delete&groupId=xxx"
-  ▼
-Cloudflare Workers (index.ts)
-  │
-  │ 3. Postbackイベント判定
-  ▼
-LinePostbackDeleteReminderEventVo
-  │
-  │ 4. dataパラメータからgroupIdを抽出
-  ▼
-lineWebhookToReminderUsecase.ts
-  │
-  │ 5. deleteReminderFromLine()
-  │    ↓
-  │    deleteRemindersByGroupId()
-  ▼
-D1 Database
-  │
-  │ 6. groupIdとuserIdでリマインダーを一括削除
-  ▼
-LINE API (Reply Message)
-  │
-  │ 7. 削除完了メッセージを返信
-  ▼
-User (LINE)
-```
-
-## 主要関数
-
-### `deleteReminderFromLine()`
-
-**場所**: [src/usecases/lineWebhookToReminderUsecase.ts:34](../src/usecases/lineWebhookToReminderUsecase.ts#L34)
-
-**責務**: リマインダーグループを削除してLINEに返信
-
-**パラメータ**:
-
-- `groupId`: リマインダーグループID
-- `userId`: LINEユーザーID
-- `replyToken`: LINE返信用トークン
-- `env`: 環境変数
-
-**処理内容**:
-
-1. `deleteRemindersByGroupId()`で一括削除
-2. `sendReplyToLine()`で削除完了メッセージを返信
-
-### `deleteRemindersByGroupId()`
-
-**場所**: [src/infrastructure/reminderRepository.ts:70](../src/infrastructure/reminderRepository.ts#L70)
-
-**責務**: 指定したgroupIdに属する全てのリマインダーを削除
-
-**パラメータ**:
-
-- `db`: D1データベースインスタンス
-- `groupId`: 削除対象のグループID
-- `userId`: LINEユーザーID（セキュリティ上、所有者確認のため必須）
-
-`groupId`と`user_id`の両方を条件にして削除する。
-
-**戻り値**: 削除されたレコード数
-
-### `LinePostbackDeleteReminderEventVo.create()`
-
-**場所**: `@shared/domain/line/infrastructure/vo/LinePostbackDeleteReminderEventVo.ts`
-
-**責務**: PostbackイベントのdataパラメータからgroupIdを抽出
-
-**入力**: PostbackイベントのdataパラメータとuserId、replyToken
-
-**出力**: 抽出したgroupId、userId、replyToken
+1. ユーザーがクイックリプライの「リマインド削除」ボタンをタップ
+2. LINEからPostbackイベントがWebhookに送信される
+3. Webhookリクエストを検証し、イベントを抽出
+4. `LinePostbackDeleteReminderVo.create()` でdataパラメータからgroupIdを抽出
+5. `deleteReminderFromLine()` を呼び出し、リマインダーを削除
+6. D1データベースでgroupIdとuserIdを条件にリマインダーを一括削除
+7. 削除完了メッセージをLINEに返信
 
 ## 注意点
 

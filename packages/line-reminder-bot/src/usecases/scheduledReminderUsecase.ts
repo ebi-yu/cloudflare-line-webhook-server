@@ -1,4 +1,4 @@
-import { sendPushMessage } from '@shared/domain/line/infrastructure/lineApiClient';
+import { sendTextMessage } from '@shared/domain/line/infrastructure/line-api-client/lineApiClient';
 import { deleteReminder, getDueReminders } from '../infrastructure/reminderRepository';
 
 /**
@@ -27,7 +27,7 @@ export async function processScheduledReminders(env: any): Promise<void> {
 						},
 					],
 				};
-				await sendPushMessage(reminder.userId, `🔔 リマインド ${label}\n\n${reminder.message}`, env.LINE_CHANNEL_TOKEN, quickReply);
+				await sendTextMessage(reminder.userId, `🔔 リマインド ${label}\n\n${reminder.message}`, env.LINE_CHANNEL_TOKEN, quickReply);
 
 				// このリマインダーを削除（他の間隔のリマインダーは保持される）
 				await deleteReminder(env.DB, reminder.id, reminder.userId);

@@ -73,7 +73,7 @@ User (LINE)
 2. `searchRemindersByKeyword()`で検索実行
 3. 検索結果が0件の場合、「見つかりませんでした」を返信
 4. 検索結果を整形（一覧表示と同様）
-5. `sendReplyToLine()`で結果メッセージを返信
+5. `sendReplyTextMessage()`で結果メッセージを返信
 
 ### `searchRemindersByKeyword()`
 

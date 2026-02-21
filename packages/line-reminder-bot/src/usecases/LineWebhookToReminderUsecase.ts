@@ -1,4 +1,4 @@
-import { sendReplyToLine } from '@shared/domain/line/infrastructure/lineApiClient';
+import { sendReplyTextMessage } from '@shared/domain/line/infrastructure/line-api-client/lineApiClient';
 import { createReminder, deleteRemindersByGroupId } from '../infrastructure/reminderRepository';
 import { ReminderInput } from '../types';
 
@@ -28,7 +28,7 @@ export async function createReminderFromLine(vo: {
 	responseMessage += '📅 通知予定:\n';
 	responseMessage += results.map((r) => `・ ${r}`).join('\n');
 
-	await sendReplyToLine(replyToken, responseMessage, env.LINE_CHANNEL_TOKEN);
+	await sendReplyTextMessage(replyToken, responseMessage, env.LINE_CHANNEL_TOKEN);
 }
 
 export async function deleteReminderFromLine(vo: {
@@ -41,7 +41,7 @@ export async function deleteReminderFromLine(vo: {
 
 	await deleteRemindersByGroupId(env.DB, groupId, userId);
 
-	await sendReplyToLine(replyToken, '✅ リマインドを削除しました。', env.LINE_CHANNEL_TOKEN);
+	await sendReplyTextMessage(replyToken, '✅ リマインドを削除しました。', env.LINE_CHANNEL_TOKEN);
 }
 
 /**

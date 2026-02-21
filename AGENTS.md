@@ -10,5 +10,4 @@ LINE BotからWebhookイベントを受け取り、処理を実行する
 
 ## サービス一覧
 
-- line-memo-bot : LINE BotのWebhookイベントを受け取り、メッセージをGithubの特定のリポジトリに保存する
 - line-remind-bot : LINE BotのWebhookイベントを受け取り、メッセージをCloudflare D1に保存し、指定した期間でリマインドする

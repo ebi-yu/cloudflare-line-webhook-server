@@ -6,10 +6,9 @@
 
 ## エントリーポイント
 
-- **ファイル**: [src/index.ts](../src/index.ts)
-- **関数**: `fetch()` ハンドラー
 - **トリガー**: LINE Messaging APIからのWebhook（テキストメッセージイベント）
 - **判定条件**: メッセージが「一覧」「list」「リスト」のいずれかに完全一致（大文字小文字区別なし）
+- **送信メッセージ形式** : Flexメッセージ
 
 ## データフロー
 
@@ -73,7 +72,7 @@ User (LINE)
    - 間隔ラベル
    - 実行時刻（日本時間）
    - メッセージ
-4. `sendReplyToLine()`で一覧メッセージを返信
+4. `sendReplyTextMessage()`で一覧メッセージを返信
 
 ### `getRemindersByUserId()`
 
