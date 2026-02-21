@@ -4,6 +4,7 @@ import { LinePostbackDeleteReminderVo } from '@shared/domain/line/infrastructure
 import { LineWebhookMessageVo } from '@shared/domain/line/infrastructure/vo/webhook/LineWebhookMessageVo';
 import { ServerErrorException } from '@shared/utils/ServerErrorException';
 import { createReminderFromLine, deleteReminderFromLine } from './usecases/lineWebhookToReminderUsecase';
+import { listRemindersForLine } from './usecases/listRemindersUsecase';
 import { processScheduledReminders } from './usecases/scheduledReminderUsecase';
 
 // リクエストデータの検証とビジネスロジックの呼び出し
@@ -38,12 +39,23 @@ export default {
 				});
 
 				// 6. ビジネスロジック実行
-				await createReminderFromLine({
-					message: messageEvent.message,
-					userId: messageEvent.userId,
-					replyToken: messageEvent.replyToken,
-					env,
-				});
+				// リマインド一覧コマンドの判定
+				const trimmedMessage = messageEvent.message.trim();
+				if (trimmedMessage === '一覧' || trimmedMessage === 'リスト' || trimmedMessage.toLowerCase() === 'list') {
+					await listRemindersForLine({
+						userId: messageEvent.userId,
+						replyToken: messageEvent.replyToken,
+						env,
+					});
+				} else {
+					// 通常のリマインド登録
+					await createReminderFromLine({
+						message: messageEvent.message,
+						userId: messageEvent.userId,
+						replyToken: messageEvent.replyToken,
+						env,
+					});
+				}
 
 				return new Response('OK', { status: 200 });
 			}
