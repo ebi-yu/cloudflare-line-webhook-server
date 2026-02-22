@@ -5,7 +5,7 @@
 	"scripts": {
 		"dev": "pnpm --filter line-webhook-server dev",
 		"deploy": "pnpm --filter line-webhook-server deploy",
-		"test": "pnpm --filter line-webhook-server test",
+		"test": "pnpm --filter line-webhook-server test:unit",
 		"cf-typegen": "pnpm --filter line-webhook-server cf-typegen"
 	},
 	"devDependencies": {
