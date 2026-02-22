@@ -1,14 +1,12 @@
 /**
  * リマインダー詳細表示のコントローラー
- * イベントデータのVO変換、ユーザー認証、Usecaseの呼び出し、LINE APIへの送信を担当
+ * イベントデータのVO変換、Usecaseの呼び出し、LINE APIへの送信を担当
  */
 
-import { checkUserAuthorization } from '@shared/domain/line/application/checkUserAuthorization';
 import { sendReplyFlexMessage, sendReplyTextMessage } from '@shared/domain/line/infrastructure/line-api-client/lineApiClient';
 import { FlexBubble, FlexComponent, FlexContainer } from '@shared/domain/line/infrastructure/vo';
 import { LinePostbackShowReminderDetailVo } from '@shared/domain/line/infrastructure/vo/postback/LinePostbackShowReminderDetailVo';
 import { LinePostbackEvent } from '@shared/domain/line/infrastructure/vo/postback/LinePostbackVo';
-import { LineWebhookConfigVo } from '@shared/domain/line/infrastructure/vo/webhook/LineWebhookConfigVo';
 import { getReminderDetail, ReminderDetail } from '../usecases/getReminderDetailUsecase';
 
 /**
@@ -17,22 +15,14 @@ import { getReminderDetail, ReminderDetail } from '../usecases/getReminderDetail
 export async function handleShowReminderDetail(vo: {
 	event: LinePostbackEvent;
 	env: Record<string, any>;
-	config: LineWebhookConfigVo;
 }): Promise<void> {
-	const { event, env, config } = vo;
+	const { event, env } = vo;
 
 	// VO変換（ドメインオブジェクトの作成）
 	const postBackEvent = LinePostbackShowReminderDetailVo.create({
 		data: event.postback.data,
 		userId: event.source?.userId,
 		replyToken: event.replyToken,
-	});
-
-	// ユーザー認証（ビジネスルール）
-	await checkUserAuthorization({
-		userId: postBackEvent.userId,
-		replyToken: postBackEvent.replyToken,
-		config,
 	});
 
 	// Usecaseを実行（ビジネスロジック）

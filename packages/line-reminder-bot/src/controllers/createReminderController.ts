@@ -1,11 +1,9 @@
 /**
  * リマインダー作成のコントローラー
- * イベントデータのVO変換、ユーザー認証、Usecaseの呼び出し、LINE APIへの送信を担当
+ * イベントデータのVO変換、Usecaseの呼び出し、LINE APIへの送信を担当
  */
 
-import { checkUserAuthorization } from '@shared/domain/line/application/checkUserAuthorization';
 import { sendReplyTextMessage } from '@shared/domain/line/infrastructure/line-api-client/lineApiClient';
-import { LineWebhookConfigVo } from '@shared/domain/line/infrastructure/vo/webhook/LineWebhookConfigVo';
 import { LineTextMessageEvent, LineWebhookMessageVo } from '@shared/domain/line/infrastructure/vo/webhook/LineWebhookMessageVo';
 import { createReminder, CreateReminderResult } from '../usecases/createReminderUsecase';
 
@@ -15,22 +13,14 @@ import { createReminder, CreateReminderResult } from '../usecases/createReminder
 export async function handleCreateReminder(vo: {
 	event: LineTextMessageEvent;
 	env: Record<string, any>;
-	config: LineWebhookConfigVo;
 }): Promise<void> {
-	const { event, env, config } = vo;
+	const { event, env } = vo;
 
 	// VO変換（ドメインオブジェクトの作成）
 	const messageEvent = LineWebhookMessageVo.create({
 		message: event.message.text,
 		userId: event.source?.userId,
 		replyToken: event.replyToken,
-	});
-
-	// ユーザー認証（ビジネスルール）
-	await checkUserAuthorization({
-		userId: messageEvent.userId,
-		replyToken: messageEvent.replyToken,
-		config,
 	});
 
 	// Usecaseを実行（ビジネスロジック）

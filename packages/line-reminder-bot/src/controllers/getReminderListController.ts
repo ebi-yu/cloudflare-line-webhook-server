@@ -1,14 +1,12 @@
 /**
  * リマインダー一覧表示のコントローラー
- * イベントデータのVO変換、ユーザー認証、Usecaseの呼び出し、LINE APIへの送信を担当
+ * イベントデータのVO変換、Usecaseの呼び出し、LINE APIへの送信を担当
  */
 
-import { checkUserAuthorization } from '@shared/domain/line/application/checkUserAuthorization';
 import { sendReplyFlexMessage, sendReplyTextMessage } from '@shared/domain/line/infrastructure/line-api-client/lineApiClient';
 import { ButtonMenuFlexContainerVo, ButtonMenuItem } from '@shared/domain/line/infrastructure/vo';
 import { LinePostbackShowReminderListVo } from '@shared/domain/line/infrastructure/vo/postback/LinePostbackShowReminderListVo';
 import { LinePostbackEvent } from '@shared/domain/line/infrastructure/vo/postback/LinePostbackVo';
-import { LineWebhookConfigVo } from '@shared/domain/line/infrastructure/vo/webhook/LineWebhookConfigVo';
 import { getReminderList, ReminderListItem } from '../usecases/getRemindersListUsecase';
 
 // ボタンラベルの最大文字数
@@ -20,22 +18,14 @@ const MAX_BUTTON_LABEL_LENGTH = 20;
 export async function handleGetReminderList(vo: {
 	event: LinePostbackEvent;
 	env: Record<string, any>;
-	config: LineWebhookConfigVo;
 }): Promise<void> {
-	const { event, env, config } = vo;
+	const { event, env } = vo;
 
 	// VO変換（ドメインオブジェクトの作成）
 	const postBackEvent = LinePostbackShowReminderListVo.create({
 		data: event.postback.data,
 		userId: event.source?.userId,
 		replyToken: event.replyToken,
-	});
-
-	// ユーザー認証（ビジネスルール）
-	await checkUserAuthorization({
-		userId: postBackEvent.userId,
-		replyToken: postBackEvent.replyToken,
-		config,
 	});
 
 	// Usecaseを実行（ビジネスロジック）

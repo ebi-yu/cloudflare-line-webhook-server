@@ -1,4 +1,5 @@
 import type { ExecutionContext, ScheduledEvent } from '@cloudflare/workers-types';
+import { checkUserAuthorization } from '@shared/domain/line/application/checkUserAuthorization';
 import { LineWebhookConfigVo, LineWebhookRequestVo } from '@shared/domain/line/infrastructure/vo';
 import { ServerErrorException } from '@shared/utils/ServerErrorException';
 import { handleCreateReminder } from './controllers/createReminderController';
@@ -22,28 +23,35 @@ export default {
 			const webhookRequest = await LineWebhookRequestVo.createFromRequest(request, config);
 			const event = webhookRequest.event;
 
-			// 3. イベントタイプによるルーティング（テキストメッセージ → リマインダー作成）
+			// 3. ユーザー認証（全イベント共通）
+			await checkUserAuthorization({
+				userId: event.source?.userId ?? '',
+				replyToken: event.replyToken ?? '',
+				config,
+			});
+
+			// 4. イベントタイプによるルーティング（テキストメッセージ → リマインダー作成）
 			if (LineWebhookRequestVo.isTextMessageEvent(event)) {
-				await handleCreateReminder({ event, env, config });
+				await handleCreateReminder({ event, env });
 				return new Response('OK', { status: 200 });
 			}
 
-			// 4. Postbackイベントのルーティング
+			// 5. Postbackイベントのルーティング
 			if (LineWebhookRequestVo.isPostbackEvent(event)) {
 				const parsedParams = new URLSearchParams(event.postback.data);
 
 				if (parsedParams.get('type') === 'list') {
-					await handleGetReminderList({ event, env, config });
+					await handleGetReminderList({ event, env });
 					return new Response('OK', { status: 200 });
 				}
 
 				if (parsedParams.get('type') === 'detail') {
-					await handleShowReminderDetail({ event, env, config });
+					await handleShowReminderDetail({ event, env });
 					return new Response('OK', { status: 200 });
 				}
 
 				if (parsedParams.get('type') === 'delete') {
-					await handleDeleteReminder({ event, env, config });
+					await handleDeleteReminder({ event, env });
 					return new Response('OK', { status: 200 });
 				}
 
