@@ -1,0 +1,49 @@
+### LINE Webhook Test (ローカル開発)
+POST http://localhost:8787
+Content-Type: application/json
+X-Line-Signature: I0nDpAtl2f6fH8ngTR2pmXMhULVTQCnaQLC5+mKtUr4=
+
+{
+  "events": [
+    {
+      "type": "message",
+      "replyToken": "9afb27d37dd34c9c8b2e0e98ba808a40",
+      "source": {
+        "userId": "U215ec4e8bddd92220e71dd63e06e1c06",
+        "type": "user"
+      },
+      "message": {
+        "type": "text",
+        "text": "水を飲む"
+      },
+      "timestamp": 1234567890123
+    }
+  ]
+}
+
+### LINE Push Message API Test
+POST https://api.line.me/v2/bot/message/push
+Content-Type: application/json
+Authorization: Bearer yZqpAAlWLshXXg5VE67cRkxqkTCr5mPp1U7MNbAJW10hkXut36T1yZ9yW0ErSmglYX1R2fJ9s3pk8j9WQpmFBjRuA1XIggZ6JxzKCOBAo7nd1bHktps5rTxUd2GimIMlQYXebvdUKdZ/67Uwgyq2VAdB04t89/1O/w1cDnyilFU=
+
+{
+  "to": "U215ec4e8bddd92220e71dd63e06e1c06",
+  "messages": [
+    {
+      "type": "text",
+      "text": "🔔 リマインド [1日後] \n\n水を飲む",
+      "quickReply": {
+        "items": [
+          {
+            "type": "action",
+            "action": {
+              "type": "postback",
+              "label": "完了",
+              "data": "action=complete&groupId=test-group-id"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
