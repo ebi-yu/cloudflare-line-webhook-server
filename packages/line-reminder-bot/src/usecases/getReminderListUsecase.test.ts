@@ -45,13 +45,13 @@ describe('getReminderList ユースケース', () => {
 		const now = new Date();
 		const future = new Date(now.getTime() + 3600000);
 		await env.DB.prepare('INSERT INTO reminders (id, user_id, message, execution_time, created_at, group_id) VALUES (?, ?, ?, ?, ?, ?)')
-			.bind('reminder-1', 'test-user-123', 'テスト1', future.toISOString(), now.toISOString(), 'group-1')
+			.bind('reminder-1', 'test-user-123', 'テスト1', future.getTime(), now.getTime(), 'group-1')
 			.run();
 		await env.DB.prepare('INSERT INTO reminders (id, user_id, message, execution_time, created_at, group_id) VALUES (?, ?, ?, ?, ?, ?)')
-			.bind('reminder-2', 'test-user-123', 'テスト1', new Date(future.getTime() + 86400000).toISOString(), now.toISOString(), 'group-1')
+			.bind('reminder-2', 'test-user-123', 'テスト1', future.getTime() + 86400000, now.getTime(), 'group-1')
 			.run();
 		await env.DB.prepare('INSERT INTO reminders (id, user_id, message, execution_time, created_at, group_id) VALUES (?, ?, ?, ?, ?, ?)')
-			.bind('reminder-3', 'test-user-123', 'テスト2', future.toISOString(), now.toISOString(), 'group-2')
+			.bind('reminder-3', 'test-user-123', 'テスト2', future.getTime(), now.getTime(), 'group-2')
 			.run();
 
 		// Act
@@ -68,10 +68,10 @@ describe('getReminderList ユースケース', () => {
 		const now = new Date();
 		const future = new Date(now.getTime() + 3600000);
 		await env.DB.prepare('INSERT INTO reminders (id, user_id, message, execution_time, created_at, group_id) VALUES (?, ?, ?, ?, ?, ?)')
-			.bind('reminder-1', 'test-user-123', 'テスト1', future.toISOString(), now.toISOString(), 'group-1')
+			.bind('reminder-1', 'test-user-123', 'テスト1', future.getTime(), now.getTime(), 'group-1')
 			.run();
 		await env.DB.prepare('INSERT INTO reminders (id, user_id, message, execution_time, created_at, group_id) VALUES (?, ?, ?, ?, ?, ?)')
-			.bind('reminder-2', 'other-user', 'テスト2', future.toISOString(), now.toISOString(), 'group-2')
+			.bind('reminder-2', 'other-user', 'テスト2', future.getTime(), now.getTime(), 'group-2')
 			.run();
 
 		// Act

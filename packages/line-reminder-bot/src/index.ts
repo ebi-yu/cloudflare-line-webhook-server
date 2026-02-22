@@ -1,3 +1,4 @@
+import type { ExecutionContext, ScheduledEvent } from '@cloudflare/workers-types';
 import { LineWebhookConfigVo, LineWebhookRequestVo } from '@shared/domain/line/infrastructure/vo';
 import { ServerErrorException } from '@shared/utils/ServerErrorException';
 import { handleCreateReminder, handleDeleteReminder, handleGetReminderList } from './controllers/reminderController';
@@ -37,6 +38,10 @@ export default {
 					await handleDeleteReminder({ event, env, config });
 					return new Response('OK', { status: 200 });
 				}
+
+				// TODO: type=detail は詳細表示機能として実装予定。
+				// formatRemindersAsButtons の data: `type=detail&groupId=...` で生成されるボタンに対応するルーティングが未実装のため、
+				// 現時点で一覧ボタンを押すと 400 が返る。詳細表示機能のイシューで実装予定。
 			}
 
 			throw new ServerErrorException('Unsupported event type', 400);
@@ -58,7 +63,7 @@ export default {
 		}
 	},
 
-	async scheduled(_event: any, env: Record<string, any>, ctx: any): Promise<void> {
+	async scheduled(_event: ScheduledEvent, env: Record<string, any>, ctx: ExecutionContext): Promise<void> {
 		ctx.waitUntil(processScheduledReminders(env));
 	},
 };

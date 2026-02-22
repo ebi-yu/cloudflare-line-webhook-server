@@ -1,0 +1,59 @@
+@richMenuId = richmenu-025cf100afa9aec4aba72411e3a4c670
+
+###　LINEリッチメニューの作成
+
+POST https://api.line.me/v2/bot/richmenu
+Authorization: Bearer {{LINE_TOKEN}}
+Content-Type: application/json
+
+{
+	"size": {
+		"width": 800,
+		"height": 250
+	},
+	"selected": true,
+	"name": "リマインダーメニュー",
+	"chatBarText": "メニュー",
+	"areas": [
+		{
+			"bounds": {
+				"x": 0,
+				"y": 0,
+				"width": 800,
+				"height": 250
+			},
+			"action": {
+				"type": "postback",
+				"label": "リマインダー一覧",
+				"data": "type=list"
+			}
+		}
+	]
+}
+
+### リッチメニューの画像をアップロードする
+
+POST https://api-data.line.me/v2/bot/richmenu/{{richMenuId}}/content
+Authorization: Bearer {{LINE_TOKEN}}
+Content-Type: image/png
+
+< ./reminder.png
+
+
+
+###　リッチメニューの一覧を取得
+
+GET https://api.line.me/v2/bot/richmenu/list
+Authorization: Bearer {{LINE_TOKEN}}
+
+
+### 作成したリッチメニューを削除
+
+
+DELETE https://api.line.me/v2/bot/richmenu/{{richMenuId}}
+Authorization: Bearer {{LINE_TOKEN}}
+
+### リッチメニューを設定
+
+POST https://api.line.me/v2/bot/user/all/richmenu/{{richMenuId}}
+Authorization: Bearer {{LINE_TOKEN}}

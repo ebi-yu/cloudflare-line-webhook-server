@@ -1,5 +1,6 @@
 import { sendTextMessage } from '@shared/domain/line/infrastructure/line-api-client/lineApiClient';
-import { deleteReminder, getDueReminders } from '../infrastructure/reminderRepository';
+import { getDueReminders } from '../infrastructure/reminderRepository';
+import { deleteReminderById } from './deleteReminderUsecase';
 
 /**
  * スケジュール実行時の期限が来たリマインダーを処理するユースケース
@@ -30,7 +31,7 @@ export async function processScheduledReminders(env: any): Promise<void> {
 				await sendTextMessage(reminder.userId, `🔔 リマインド ${label}\n\n${reminder.message}`, env.LINE_CHANNEL_TOKEN, quickReply);
 
 				// このリマインダーを削除（他の間隔のリマインダーは保持される）
-				await deleteReminder(env.DB, reminder.id, reminder.userId);
+				await deleteReminderById({ db: env.DB, id: reminder.id, userId: reminder.userId });
 			} catch (error) {
 				console.error(`Error processing reminder ${reminder.id}:`, error);
 			}
