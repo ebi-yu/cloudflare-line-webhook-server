@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "mcp__drawio__open_drawio_mermaid"
+      "mcp__drawio__open_drawio_mermaid",
+      "Bash(pnpm run build:*)",
+      "Bash(pnpm exec tsc:*)"
     ]
   }
 }

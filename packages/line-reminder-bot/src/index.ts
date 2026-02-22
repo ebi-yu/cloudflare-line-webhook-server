@@ -4,8 +4,10 @@ import { LinePostbackDeleteReminderVo } from '@shared/domain/line/infrastructure
 import { LinePostbackShowReminderListVo } from '@shared/domain/line/infrastructure/vo/postback/LinePostbackShowReminderListVo';
 import { LineWebhookMessageVo } from '@shared/domain/line/infrastructure/vo/webhook/LineWebhookMessageVo';
 import { ServerErrorException } from '@shared/utils/ServerErrorException';
-import { createReminderFromLine, deleteReminderFromLine, showReminderListFromLine } from './usecases/LineWebhookToReminderUsecase';
-import { processScheduledReminders } from './usecases/scheduledReminderUsecase';
+import { createReminderFromLine } from './usecases/createReminderUsecase';
+import { deleteReminderFromLine } from './usecases/deleteReminderUsecase';
+import { showReminderListFromLine } from './usecases/listRemindersUsecase';
+import { processScheduledReminders } from './usecases/processScheduledRemindersUsecase';
 
 // リクエストデータの検証とビジネスロジックの呼び出し
 export default {
