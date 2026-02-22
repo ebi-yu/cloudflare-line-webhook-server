@@ -6,3 +6,8 @@ interface Env {
 	LINE_CHANNEL_SECRET: string;
 	LINE_OWN_USER_ID: string;
 }
+
+// cloudflare:test の ProvidedEnv に Env を反映させる
+declare module 'cloudflare:test' {
+	interface ProvidedEnv extends Env {}
+}

@@ -18,7 +18,7 @@ function mapDbRowToReminder(row: any): Reminder {
 /**
  * リマインダーをデータベースに保存
  */
-export async function createReminder(db: D1Database, userId: string, input: ReminderInput): Promise<Reminder> {
+export async function saveReminder(db: D1Database, userId: string, input: ReminderInput): Promise<Reminder> {
 	const now = Date.now();
 	const reminder: Reminder = {
 		id: crypto.randomUUID(),
@@ -33,7 +33,7 @@ export async function createReminder(db: D1Database, userId: string, input: Remi
 	await db
 		.prepare(
 			`INSERT INTO reminders (id, user_id, message, execution_time, created_at, group_id, interval_label)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
 		)
 		.bind(
 			reminder.id,
@@ -42,7 +42,7 @@ export async function createReminder(db: D1Database, userId: string, input: Remi
 			reminder.executionTime,
 			reminder.createdAt,
 			reminder.groupId ?? null,
-			reminder.intervalLabel ?? null
+			reminder.intervalLabel ?? null,
 		)
 		.run();
 

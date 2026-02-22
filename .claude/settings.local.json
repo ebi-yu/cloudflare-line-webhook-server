@@ -3,7 +3,9 @@
     "allow": [
       "mcp__drawio__open_drawio_mermaid",
       "Bash(pnpm run build:*)",
-      "Bash(pnpm exec tsc:*)"
+      "Bash(pnpm exec tsc:*)",
+      "Bash(pnpm test:integration:*)",
+      "Bash(pnpm d1:migrations:apply:local:*)"
     ]
   }
 }

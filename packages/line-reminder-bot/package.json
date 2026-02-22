@@ -6,6 +6,10 @@
 	"scripts": {
 		"dev": "wrangler dev",
 		"deploy": "wrangler deploy",
+		"test": "vitest",
+		"test:unit": "vitest run src/**/*.test.ts",
+		"test:integration": "vitest run tests/integration",
+		"test:watch": "vitest watch",
 		"env:deploy": "wrangler secret put LINE_CHANNEL_TOKEN && wrangler secret put LINE_CHANNEL_SECRET && wrangler secret put LINE_OWN_USER_ID",
 		"d1:create": "wrangler d1 create line-reminder-db",
 		"d1:migrations:apply": "wrangler d1 migrations apply line-reminder-db --remote",

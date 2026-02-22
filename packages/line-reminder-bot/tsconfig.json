@@ -4,8 +4,9 @@
 		"baseUrl": ".",
 		"paths": {
 			"@shared/*": ["../../shared/*"]
-		}
+		},
+		"types": ["@cloudflare/vitest-pool-workers"]
 	},
-	"include": ["src/**/*"],
+	"include": ["src/**/*", "tests/**/*", "worker-configuration.d.ts"],
 	"exclude": ["node_modules"]
 }

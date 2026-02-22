@@ -1,18 +1,11 @@
-import { sendReplyTextMessage } from '@shared/domain/line/infrastructure/line-api-client/lineApiClient';
+import { D1Database } from '@cloudflare/workers-types/experimental';
 import { deleteRemindersByGroupId } from '../infrastructure/reminderRepository';
 
 /**
  * リマインダーを削除するユースケース
+ * ビジネスロジックのみを担当
  */
-export async function deleteReminderFromLine(vo: {
-	groupId: string;
-	userId: string;
-	replyToken: string;
-	env: Record<string, any>;
-}): Promise<void> {
-	const { groupId, userId, replyToken, env } = vo;
-
-	await deleteRemindersByGroupId(env.DB, groupId, userId);
-
-	await sendReplyTextMessage(replyToken, '✅ リマインドを削除しました。', env.LINE_CHANNEL_TOKEN);
+export async function deleteReminder(vo: { groupId: string; userId: string; db: D1Database }): Promise<void> {
+	const { groupId, userId, db } = vo;
+	await deleteRemindersByGroupId(db, groupId, userId);
 }
