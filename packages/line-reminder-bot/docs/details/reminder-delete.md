@@ -17,6 +17,6 @@
 1. リマインド詳細のFlex Messageの削除ボタンを選択/クイック操作から削除を選択
 2. PostbackイベントがLINEから送信される
 3. Postbackイベントを検証し、イベントデータから`groupId`を抽出
-4. `deleteReminderFromLine()` を呼び出し、リマインダーを削除
+4. `deleteReminder()` を呼び出し、リマインダーを削除
 5. D1データベースから指定`groupId`のリマインダーを削除
 6. 削除完了メッセージをLINEに返信
