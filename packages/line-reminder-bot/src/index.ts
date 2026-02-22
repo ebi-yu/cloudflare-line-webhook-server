@@ -4,8 +4,8 @@ import { LineWebhookConfigVo, LineWebhookRequestVo } from '@shared/domain/line/i
 import { ServerErrorException } from '@shared/utils/ServerErrorException';
 import { handleCreateReminder } from './controllers/createReminderController';
 import { handleDeleteReminder } from './controllers/deleteReminderController';
+import { handleGetReminderDetail } from './controllers/getReminderDetailController';
 import { handleGetReminderList } from './controllers/getReminderListController';
-import { handleShowReminderDetail } from './controllers/showReminderDetailController';
 import { processScheduledReminders } from './usecases/processScheduledRemindersUsecase';
 
 // HTTPリクエストの受け取り、Webhook署名検証、イベントルーティング
@@ -46,7 +46,7 @@ export default {
 				}
 
 				if (parsedParams.get('type') === 'detail') {
-					await handleShowReminderDetail({ event, env });
+					await handleGetReminderDetail({ event, env });
 					return new Response('OK', { status: 200 });
 				}
 
@@ -54,7 +54,6 @@ export default {
 					await handleDeleteReminder({ event, env });
 					return new Response('OK', { status: 200 });
 				}
-
 			}
 
 			throw new ServerErrorException('Unsupported event type', 400);

@@ -12,10 +12,7 @@ import { getReminderDetail, ReminderDetail } from '../usecases/getReminderDetail
 /**
  * リマインダー詳細表示のコントローラー
  */
-export async function handleShowReminderDetail(vo: {
-	event: LinePostbackEvent;
-	env: Record<string, any>;
-}): Promise<void> {
+export async function handleGetReminderDetail(vo: { event: LinePostbackEvent; env: Record<string, any> }): Promise<void> {
 	const { event, env } = vo;
 
 	// VO変換（ドメインオブジェクトの作成）
