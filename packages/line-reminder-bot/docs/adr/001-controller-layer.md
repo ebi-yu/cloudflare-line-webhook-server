@@ -72,22 +72,22 @@ export async function createReminder(vo: {
 
 ```typescript
 export async function handleCreateReminder(vo: {
-  event: MessageEvent;
-  config: LineWebhookConfigVo;
-  env: Env;
+	event: MessageEvent;
+	config: LineWebhookConfigVo;
+	env: Env;
 }): Promise<void> {
-  // 1. Usecaseを呼び出す
-  const result = await createReminder({
-    message: messageEvent.message,
-    userId: messageEvent.userId,
-    db: env.DB,
-  });
+	// 1. Usecaseを呼び出す
+	const result = await createReminder({
+		message: messageEvent.message,
+		userId: messageEvent.userId,
+		db: env.DB,
+	});
 
-  // 2. 結果をフォーマット
-  const responseMessage = formatCreateReminderResponse(result);
+	// 2. 結果をフォーマット
+	const responseMessage = formatCreateReminderResponse(result);
 
-  // 3. LINE APIに送信
-  await sendReplyTextMessage(replyToken, responseMessage, env.LINE_CHANNEL_TOKEN);
+	// 3. LINE APIに送信
+	await sendReplyTextMessage(replyToken, responseMessage, env.LINE_CHANNEL_TOKEN);
 }
 ```
 
@@ -127,6 +127,7 @@ export async function handleCreateReminder(vo: {
 ### 代替案1: Usecaseのまま維持
 
 **却下理由:**
+
 - テストが困難
 - 再利用性が低い
 - 関心の分離が不明確
@@ -138,6 +139,7 @@ Controller → Usecase → Presenter → LINE API
 ```
 
 **却下理由:**
+
 - 小規模プロジェクトには過剰
 - Controller層で十分に責務分離ができる
 - 将来必要になれば、Controllerを分割してPresenter層を追加することも可能

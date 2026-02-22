@@ -19,9 +19,9 @@
 ```typescript
 // index.ts
 const messageEvent = LineWebhookMessageVo.create({
-  message: event.message!.text,
-  userId: event.source?.userId,
-  replyToken: event.replyToken,
+	message: event.message!.text,
+	userId: event.source?.userId,
+	replyToken: event.replyToken,
 });
 
 // 型安全なオブジェクトとしてControllerに渡す
@@ -29,6 +29,7 @@ await handleCreateReminder(messageEvent, config, env);
 ```
 
 **理由:**
+
 - HTTPリクエストの形式検証として捉える
 - 必須フィールドの存在確認
 - 型の正規化
@@ -43,13 +44,14 @@ await handleCreateReminder(event, config, env);
 
 // Controller
 const messageEvent = LineWebhookMessageVo.create({
-  message: event.message!.text,
-  userId: event.source?.userId,
-  replyToken: event.replyToken,
+	message: event.message!.text,
+	userId: event.source?.userId,
+	replyToken: event.replyToken,
 });
 ```
 
 **理由:**
+
 - Voはドメインオブジェクト
 - ドメインオブジェクトの生成はビジネス層の責務
 - 「ビジネスで扱える形に変換」
@@ -63,6 +65,7 @@ const messageEvent = LineWebhookMessageVo.create({
 ### 1. index.tsをHTTPプロトコル処理のみに限定
 
 index.tsはHTTPプロトコルレベルの処理のみを担当すべきです:
+
 - リクエストの受け取り
 - Webhook署名検証
 - イベント解析（JSONパース）
@@ -73,6 +76,7 @@ index.tsはHTTPプロトコルレベルの処理のみを担当すべきです:
 ### 2. Voはドメインオブジェクト
 
 `LineWebhookMessageVo`は単なるデータ転送オブジェクト（DTO）ではなく、ドメインモデルの一部です:
+
 - バリデーションルールを含む
 - ドメイン知識を持つ
 - ビジネス層で扱うオブジェクト
@@ -82,6 +86,7 @@ index.tsはHTTPプロトコルレベルの処理のみを担当すべきです:
 ### 3. LINE Messaging APIの知識をController以降に局所化
 
 Voの作成には、LINE Messaging APIの知識が必要です:
+
 - どのフィールドが必須か
 - どのフィールド名を使うか
 - どのようにデータを抽出するか
@@ -92,6 +97,7 @@ Controller以降に局所化することで、index.tsをプラットフォー�
 ### 4. テストしやすい
 
 Controllerのテストで、Vo生成のテストもカバーできます:
+
 - Vo生成のバリデーションエラー
 - 必須フィールドの欠落
 - 不正なデータ形式
@@ -101,6 +107,7 @@ index.ts側でVoを作成すると、これらのテストケースがindex.ts�
 ### 5. 将来の拡張性
 
 将来、Slack等の別のイベントソースを追加する際:
+
 - index.tsは変更不要（ルーティングの追加のみ）
 - 各プラットフォーム固有のControllerでVoを作成
 

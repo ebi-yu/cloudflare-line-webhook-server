@@ -4,16 +4,16 @@
 	"main": "src/index.ts",
 	"compatibility_date": "2025-03-13",
 	"observability": {
-		"enabled": true
+		"enabled": true,
 	},
 	"d1_databases": [
 		{
 			"binding": "DB",
 			"database_name": "line-reminder-db",
-			"database_id": "8390e640-3e78-44ca-9aa5-410fe264d7be"
-		}
+			"database_id": "8390e640-3e78-44ca-9aa5-410fe264d7be",
+		},
 	],
 	"triggers": {
-		"crons": ["*/5 * * * *"]
-	}
+		"crons": ["*/5 * * * *"],
+	},
 }

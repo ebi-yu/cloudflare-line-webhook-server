@@ -5,6 +5,8 @@
 	"type": "module",
 	"scripts": {
 		"dev": "wrangler dev",
+		"lint": "oxlint",
+		"lint:fix": "oxlint --fix",
 		"deploy": "wrangler deploy",
 		"test:unit": "vitest run src/**/*.test.ts",
 		"test:integration": "vitest run tests/integration",

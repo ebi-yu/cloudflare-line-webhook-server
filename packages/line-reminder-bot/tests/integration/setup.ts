@@ -1,7 +1,7 @@
 /**
  * 統合テスト用のセットアップとヘルパー関数
  */
-import { env as cloudflareEnv } from 'cloudflare:test';
+import { env as cloudflareEnv } from "cloudflare:test";
 
 export interface IntegrationTestEnv {
 	LINE_CHANNEL_TOKEN: string;
@@ -22,8 +22,8 @@ export function loadTestEnv(): IntegrationTestEnv {
 
 	if (!token || !secret || !userId) {
 		throw new Error(
-			'環境変数が設定されていません。.dev.vars ファイルを確認してください。\n' +
-				'必要な変数: LINE_CHANNEL_TOKEN, LINE_CHANNEL_SECRET, LINE_OWN_USER_ID',
+			"環境変数が設定されていません。.dev.vars ファイルを確認してください。\n" +
+				"必要な変数: LINE_CHANNEL_TOKEN, LINE_CHANNEL_SECRET, LINE_OWN_USER_ID",
 		);
 	}
 
@@ -41,5 +41,5 @@ export function loadTestEnv(): IntegrationTestEnv {
  * 統合テストではPush APIを使用することを推奨
  */
 export function generateDummyReplyToken(): string {
-	return 'dummy-reply-token-for-testing';
+	return "dummy-reply-token-for-testing";
 }

@@ -1,4 +1,4 @@
-import { D1Database } from '@cloudflare/workers-types/experimental';
+import { D1Database } from "@cloudflare/workers-types/experimental";
 
 interface Env {
 	DB: D1Database;
@@ -8,6 +8,6 @@ interface Env {
 }
 
 // cloudflare:test の ProvidedEnv に Env を反映させる
-declare module 'cloudflare:test' {
+declare module "cloudflare:test" {
 	interface ProvidedEnv extends Env {}
 }

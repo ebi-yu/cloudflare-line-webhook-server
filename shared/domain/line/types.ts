@@ -18,9 +18,9 @@ export interface LineEvent {
 
 // メッセージの送信元情報
 export type LineEventSource =
-	| { type: 'user'; userId: string }
-	| { type: 'group'; groupId: string; userId?: string }
-	| { type: 'room'; roomId: string; userId?: string };
+	| { type: "user"; userId: string }
+	| { type: "group"; groupId: string; userId?: string }
+	| { type: "room"; roomId: string; userId?: string };
 
 // メッセージの型
 export interface LineMessage {

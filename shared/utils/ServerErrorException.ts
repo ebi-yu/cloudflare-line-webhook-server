@@ -4,7 +4,7 @@ export class ServerErrorException extends Error {
 
 	constructor(message: string, statusCode: number = 500, errors: string[] = []) {
 		super(message);
-		this.name = 'ServerErrorException';
+		this.name = "ServerErrorException";
 		this.errors = errors;
 		this.statusCode = statusCode;
 	}

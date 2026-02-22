@@ -8,12 +8,15 @@
  * pnpm test:integration
  */
 
-import { sendFlexMessage, sendTextMessage } from '@shared/domain/line/infrastructure/line-api-client/lineApiClient';
-import { ButtonMenuFlexContainerVo, ButtonMenuItem } from '@shared/domain/line/infrastructure/vo';
-import { beforeAll, describe, expect, it } from 'vitest';
-import { IntegrationTestEnv, loadTestEnv } from './setup';
+import {
+	sendFlexMessage,
+	sendTextMessage,
+} from "@shared/domain/line/infrastructure/line-api-client/lineApiClient";
+import { ButtonMenuFlexContainerVo, ButtonMenuItem } from "@shared/domain/line/infrastructure/vo";
+import { beforeAll, describe, expect, it } from "vitest";
+import { IntegrationTestEnv, loadTestEnv } from "./setup";
 
-describe('LINE API 統合テスト', () => {
+describe("LINE API 統合テスト", () => {
 	let env: IntegrationTestEnv;
 
 	beforeAll(() => {
@@ -22,8 +25,8 @@ describe('LINE API 統合テスト', () => {
 		console.log(`送信先ユーザーID: ${env.LINE_OWN_USER_ID}\n`);
 	});
 
-	it('テキストメッセージを送信できる', async () => {
-		const testMessage = '[統合テスト] テキストメッセージのテスト';
+	it("テキストメッセージを送信できる", async () => {
+		const testMessage = "[統合テスト] テキストメッセージのテスト";
 
 		await sendTextMessage(env.LINE_OWN_USER_ID, testMessage, env.LINE_CHANNEL_TOKEN);
 
@@ -32,24 +35,24 @@ describe('LINE API 統合テスト', () => {
 		console.log(`✅ テキストメッセージを送信しました: "${testMessage}"`);
 	}, 10000); // タイムアウトを10秒に設定
 
-	it('クイックリプライ付きメッセージを送信できる', async () => {
-		const testMessage = '[統合テスト] クイックリプライのテスト';
+	it("クイックリプライ付きメッセージを送信できる", async () => {
+		const testMessage = "[統合テスト] クイックリプライのテスト";
 		const quickReply = {
 			items: [
 				{
-					type: 'action',
+					type: "action",
 					action: {
-						type: 'postback',
-						label: 'はい',
-						data: 'action=yes',
+						type: "postback",
+						label: "はい",
+						data: "action=yes",
 					},
 				},
 				{
-					type: 'action',
+					type: "action",
 					action: {
-						type: 'postback',
-						label: 'いいえ',
-						data: 'action=no',
+						type: "postback",
+						label: "いいえ",
+						data: "action=no",
 					},
 				},
 			],
@@ -61,18 +64,18 @@ describe('LINE API 統合テスト', () => {
 		console.log(`✅ クイックリプライ付きメッセージを送信しました`);
 	}, 10000);
 
-	it('大量のボタンがあるFlexメッセージ（カルーセル）を送信できる', async () => {
+	it("大量のボタンがあるFlexメッセージ（カルーセル）を送信できる", async () => {
 		// 15個のボタンを作成（カルーセル表示になる）
 		const buttons: ButtonMenuItem[] = Array.from({ length: 15 }, (_, i) => ({
 			label: `テスト項目${i + 1}`,
-			type: 'postback' as const,
+			type: "postback" as const,
 			data: `type=test&id=${i + 1}`,
 		}));
 
 		const flexContainer = ButtonMenuFlexContainerVo.create(buttons);
 		await sendFlexMessage(
 			env.LINE_OWN_USER_ID,
-			'[統合テスト] カルーセル形式のFlexメッセージ',
+			"[統合テスト] カルーセル形式のFlexメッセージ",
 			flexContainer.container,
 			env.LINE_CHANNEL_TOKEN,
 		);

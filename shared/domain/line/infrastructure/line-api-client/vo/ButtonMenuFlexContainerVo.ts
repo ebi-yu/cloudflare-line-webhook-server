@@ -4,48 +4,49 @@
 export type FlexContainer = FlexBubble | FlexCarousel;
 
 export type FlexBubble = {
-	type: 'bubble';
+	type: "bubble";
 	body?: FlexBox;
 	header?: FlexBox;
 	footer?: FlexBox;
 };
 
 export type FlexCarousel = {
-	type: 'carousel';
+	type: "carousel";
 	contents: FlexBubble[];
 };
 
 export type FlexBox = {
-	type: 'box';
-	layout: 'horizontal' | 'vertical' | 'baseline';
+	type: "box";
+	layout: "horizontal" | "vertical" | "baseline";
 	contents: FlexComponent[];
 };
 
 export type FlexComponent = FlexBox | FlexButton | FlexText | FlexSpacer;
 
 export type FlexButton = {
-	type: 'button';
+	type: "button";
 	action: FlexAction;
-	style?: 'primary' | 'secondary' | 'link';
+	style?: "primary" | "secondary" | "link";
 	color?: string;
-	height?: 'sm' | 'md';
+	height?: "sm" | "md";
 };
 
 export type FlexText = {
-	type: 'text';
+	type: "text";
 	text: string;
 	size?: string;
-	weight?: 'regular' | 'bold';
+	weight?: "regular" | "bold";
 	color?: string;
+	margin?: "none" | "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
 };
 
 export type FlexSpacer = {
-	type: 'spacer';
-	size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
+	type: "spacer";
+	size?: "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
 };
 
 export type FlexAction = {
-	type: 'uri' | 'postback' | 'message';
+	type: "uri" | "postback" | "message";
 	label: string;
 	uri?: string;
 	data?: string;
@@ -57,7 +58,11 @@ export type FlexAction = {
  */
 export type ButtonMenuItem = {
 	label: string;
-} & ({ type: 'uri'; uri: string } | { type: 'postback'; data: string } | { type: 'message'; text: string });
+} & (
+	| { type: "uri"; uri: string }
+	| { type: "postback"; data: string }
+	| { type: "message"; text: string }
+);
 
 /**
  * ボタンメニュー用のFlexContainerを作成するVO
@@ -73,23 +78,23 @@ export class ButtonMenuFlexContainerVo {
 	 */
 	static create(buttons: ButtonMenuItem[]): ButtonMenuFlexContainerVo {
 		const buttonComponents: FlexButton[] = buttons.map((button) => ({
-			type: 'button',
+			type: "button",
 			action: {
 				type: button.type,
 				label: button.label,
-				...(button.type === 'uri' && { uri: button.uri }),
-				...(button.type === 'postback' && { data: button.data }),
-				...(button.type === 'message' && { text: button.text }),
+				...(button.type === "uri" && { uri: button.uri }),
+				...(button.type === "postback" && { data: button.data }),
+				...(button.type === "message" && { text: button.text }),
 			},
 		}));
 
 		// 10個以下の場合は単一のbubble
 		if (buttons.length <= this.BUTTONS_PER_BUBBLE) {
 			const container: FlexContainer = {
-				type: 'bubble',
+				type: "bubble",
 				body: {
-					type: 'box',
-					layout: 'vertical',
+					type: "box",
+					layout: "vertical",
 					contents: buttonComponents,
 				},
 			};
@@ -101,17 +106,17 @@ export class ButtonMenuFlexContainerVo {
 		for (let i = 0; i < buttonComponents.length; i += this.BUTTONS_PER_BUBBLE) {
 			const bubbleButtons = buttonComponents.slice(i, i + this.BUTTONS_PER_BUBBLE);
 			bubbles.push({
-				type: 'bubble',
+				type: "bubble",
 				body: {
-					type: 'box',
-					layout: 'vertical',
+					type: "box",
+					layout: "vertical",
 					contents: bubbleButtons,
 				},
 			});
 		}
 
 		const container: FlexContainer = {
-			type: 'carousel',
+			type: "carousel",
 			contents: bubbles,
 		};
 		return new ButtonMenuFlexContainerVo(container);

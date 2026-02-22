@@ -13,6 +13,7 @@
 index.ts（Router/Handler層）がどこまでの処理を担当すべきか議論になりました。
 
 特に以下の処理の配置について:
+
 - Webhook設定の生成
 - Webhook署名検証
 - イベント解析
@@ -63,6 +64,7 @@ index.tsは以下の処理を担当します:
 ### 1. Webhook検証はセキュリティに関わるインフラ処理
 
 Webhook署名検証は、リクエストの信頼性を確保するセキュリティ処理です:
+
 - 不正なリクエストを早期に弾く
 - リクエストの送信元がLINE Platformであることを保証
 
@@ -72,6 +74,7 @@ Webhook署名検証は、リクエストの信頼性を確保するセキュリ�
 ### 2. イベント解析はHTTPプロトコルのパース処理
 
 イベント解析は、HTTPリクエストボディ（JSON）をパースする処理です:
+
 - プロトコルレベルの処理
 - ビジネスロジックではない
 - ドメイン知識を必要としない
@@ -82,10 +85,10 @@ HTTPプロトコルに関する知識は、index.tsに閉じ込めるべきで�
 
 Webhook署名検証とユーザー認証は別物です:
 
-| 処理 | 目的 | レイヤー |
-|------|------|----------|
-| Webhook署名検証 | リクエストがLINE Platformから来たことを保証 | index.ts（インフラ） |
-| ユーザー認証 | このユーザーがこの操作を許可されているか | Controller（ビジネス） |
+| 処理            | 目的                                        | レイヤー               |
+| --------------- | ------------------------------------------- | ---------------------- |
+| Webhook署名検証 | リクエストがLINE Platformから来たことを保証 | index.ts（インフラ）   |
+| ユーザー認証    | このユーザーがこの操作を許可されているか    | Controller（ビジネス） |
 
 ユーザー認証は「誰がこの操作を許可されているか」というビジネスルールです。
 ビジネスルールはビジネス層（Controller）の責務です。
@@ -93,6 +96,7 @@ Webhook署名検証とユーザー認証は別物です:
 ### 4. ルーティングはインフラ処理
 
 イベントタイプによるルーティングは、インフラ層の責務です:
+
 - どのイベントをどのハンドラーに振り分けるか
 - HTTPプロトコルレベルの処理
 - ビジネスロジックではない
@@ -127,28 +131,28 @@ Webhook署名検証とユーザー認証は別物です:
 ```typescript
 // index.ts
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
-    // 1. Webhook設定の生成（環境変数から）
-    const config = LineWebhookConfigVo.create({
-      channelSecret: env.LINE_CHANNEL_SECRET,
-      channelToken: env.LINE_CHANNEL_TOKEN,
-      allowedUserId: env.LINE_OWN_USER_ID,
-    });
+	async fetch(request: Request, env: Env): Promise<Response> {
+		// 1. Webhook設定の生成（環境変数から）
+		const config = LineWebhookConfigVo.create({
+			channelSecret: env.LINE_CHANNEL_SECRET,
+			channelToken: env.LINE_CHANNEL_TOKEN,
+			allowedUserId: env.LINE_OWN_USER_ID,
+		});
 
-    // 2. Webhook検証とイベント解析
-    const webhookRequest = await LineWebhookRequestVo.createFromRequest(request, config);
-    const event = webhookRequest.event;
+		// 2. Webhook検証とイベント解析
+		const webhookRequest = await LineWebhookRequestVo.createFromRequest(request, config);
+		const event = webhookRequest.event;
 
-    // 3. イベントタイプによるルーティング
-    if (LineWebhookRequestVo.isTextMessageEvent(event)) {
-      await handleCreateReminder(event, config, env);
-    } else if (LineWebhookRequestVo.isPostbackEvent(event)) {
-      // ...
-    }
+		// 3. イベントタイプによるルーティング
+		if (LineWebhookRequestVo.isTextMessageEvent(event)) {
+			await handleCreateReminder(event, config, env);
+		} else if (LineWebhookRequestVo.isPostbackEvent(event)) {
+			// ...
+		}
 
-    return new Response('OK', { status: 200 });
-  }
-}
+		return new Response("OK", { status: 200 });
+	},
+};
 ```
 
 ## 参考資料

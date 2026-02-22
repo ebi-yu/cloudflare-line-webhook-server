@@ -3,10 +3,10 @@
  * イベントデータのVO変換、Usecaseの呼び出し、LINE APIへの送信を担当
  */
 
-import { sendReplyTextMessage } from '@shared/domain/line/infrastructure/line-api-client/lineApiClient';
-import { LinePostbackDeleteReminderVo } from '@shared/domain/line/infrastructure/vo/postback/LinePostbackDeleteReminderVo';
-import { LinePostbackEvent } from '@shared/domain/line/infrastructure/vo/postback/LinePostbackVo';
-import { deleteReminder } from '../usecases/deleteReminderUsecase';
+import { sendReplyTextMessage } from "@shared/domain/line/infrastructure/line-api-client/lineApiClient";
+import { LinePostbackDeleteReminderVo } from "@shared/domain/line/infrastructure/vo/postback/LinePostbackDeleteReminderVo";
+import { LinePostbackEvent } from "@shared/domain/line/infrastructure/vo/postback/LinePostbackVo";
+import { deleteReminder } from "../usecases/deleteReminderUsecase";
 
 /**
  * リマインダー削除のコントローラー
@@ -32,5 +32,9 @@ export async function handleDeleteReminder(vo: {
 	});
 
 	// LINE APIに送信
-	await sendReplyTextMessage(postBackEvent.replyToken, '✅ リマインドを削除しました。', env.LINE_CHANNEL_TOKEN);
+	await sendReplyTextMessage(
+		postBackEvent.replyToken,
+		"✅ リマインドを削除しました。",
+		env.LINE_CHANNEL_TOKEN,
+	);
 }

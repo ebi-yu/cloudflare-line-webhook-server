@@ -1,6 +1,6 @@
-import { ServerErrorException } from '../../../utils/ServerErrorException';
-import { sendReplyTextMessage } from '../infrastructure/line-api-client/lineApiClient';
-import { LineWebhookConfigVo } from '../infrastructure/vo/webhook/LineWebhookConfigVo';
+import { ServerErrorException } from "../../../utils/ServerErrorException";
+import { sendReplyTextMessage } from "../infrastructure/line-api-client/lineApiClient";
+import { LineWebhookConfigVo } from "../infrastructure/vo/webhook/LineWebhookConfigVo";
 
 /**
  * ユーザー認証を行い、未認証の場合は例外を投げる
@@ -16,8 +16,8 @@ export async function checkUserAuthorization({
 	config: LineWebhookConfigVo;
 }): Promise<void> {
 	if (!config.isAllowedUser(userId)) {
-		await sendReplyTextMessage(replyToken, '認証されていないユーザーです。', config.channelToken);
-		const error = new ServerErrorException('Unauthorized user', 403);
+		await sendReplyTextMessage(replyToken, "認証されていないユーザーです。", config.channelToken);
+		const error = new ServerErrorException("Unauthorized user", 403);
 		error.statusCode = 403;
 		throw error;
 	}

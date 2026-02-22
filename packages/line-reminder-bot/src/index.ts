@@ -1,12 +1,12 @@
-import type { ExecutionContext, ScheduledEvent } from '@cloudflare/workers-types';
-import { checkUserAuthorization } from '@shared/domain/line/application/checkUserAuthorization';
-import { LineWebhookConfigVo, LineWebhookRequestVo } from '@shared/domain/line/infrastructure/vo';
-import { ServerErrorException } from '@shared/utils/ServerErrorException';
-import { handleCreateReminder } from './controllers/createReminderController';
-import { handleDeleteReminder } from './controllers/deleteReminderController';
-import { handleGetReminderDetail } from './controllers/getReminderDetailController';
-import { handleGetReminderList } from './controllers/getReminderListController';
-import { processScheduledReminders } from './usecases/processScheduledRemindersUsecase';
+import type { ExecutionContext, ScheduledEvent } from "@cloudflare/workers-types";
+import { checkUserAuthorization } from "@shared/domain/line/application/checkUserAuthorization";
+import { LineWebhookConfigVo, LineWebhookRequestVo } from "@shared/domain/line/infrastructure/vo";
+import { ServerErrorException } from "@shared/utils/ServerErrorException";
+import { handleCreateReminder } from "./controllers/createReminderController";
+import { handleDeleteReminder } from "./controllers/deleteReminderController";
+import { handleGetReminderDetail } from "./controllers/getReminderDetailController";
+import { handleGetReminderList } from "./controllers/getReminderListController";
+import { processScheduledReminders } from "./usecases/processScheduledRemindersUsecase";
 
 // HTTPリクエストの受け取り、Webhook署名検証、イベントルーティング
 export default {
@@ -25,40 +25,40 @@ export default {
 
 			// 3. ユーザー認証（全イベント共通）
 			await checkUserAuthorization({
-				userId: event.source?.userId ?? '',
-				replyToken: event.replyToken ?? '',
+				userId: event.source?.userId ?? "",
+				replyToken: event.replyToken ?? "",
 				config,
 			});
 
 			// 4. イベントタイプによるルーティング（テキストメッセージ → リマインダー作成）
 			if (LineWebhookRequestVo.isTextMessageEvent(event)) {
 				await handleCreateReminder({ event, env });
-				return new Response('OK', { status: 200 });
+				return new Response("OK", { status: 200 });
 			}
 
 			// 5. Postbackイベントのルーティング
 			if (LineWebhookRequestVo.isPostbackEvent(event)) {
 				const parsedParams = new URLSearchParams(event.postback.data);
 
-				if (parsedParams.get('type') === 'list') {
+				if (parsedParams.get("type") === "list") {
 					await handleGetReminderList({ event, env });
-					return new Response('OK', { status: 200 });
+					return new Response("OK", { status: 200 });
 				}
 
-				if (parsedParams.get('type') === 'detail') {
+				if (parsedParams.get("type") === "detail") {
 					await handleGetReminderDetail({ event, env });
-					return new Response('OK', { status: 200 });
+					return new Response("OK", { status: 200 });
 				}
 
-				if (parsedParams.get('type') === 'delete') {
+				if (parsedParams.get("type") === "delete") {
 					await handleDeleteReminder({ event, env });
-					return new Response('OK', { status: 200 });
+					return new Response("OK", { status: 200 });
 				}
 			}
 
-			throw new ServerErrorException('Unsupported event type', 400);
+			throw new ServerErrorException("Unsupported event type", 400);
 		} catch (error) {
-			console.error('Error handling webhook:', error);
+			console.error("Error handling webhook:", error);
 			if (error instanceof ServerErrorException) {
 				return new Response(
 					JSON.stringify({
@@ -67,15 +67,19 @@ export default {
 					}),
 					{
 						status: error.statusCode,
-						headers: { 'Content-Type': 'application/json' },
+						headers: { "Content-Type": "application/json" },
 					},
 				);
 			}
-			return new Response('Internal Server Error', { status: 500 });
+			return new Response("Internal Server Error", { status: 500 });
 		}
 	},
 
-	async scheduled(_event: ScheduledEvent, env: Record<string, any>, ctx: ExecutionContext): Promise<void> {
+	async scheduled(
+		_event: ScheduledEvent,
+		env: Record<string, any>,
+		ctx: ExecutionContext,
+	): Promise<void> {
 		ctx.waitUntil(processScheduledReminders(env));
 	},
 };

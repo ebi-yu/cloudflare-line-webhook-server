@@ -1,5 +1,5 @@
-import { D1Database } from '@cloudflare/workers-types/experimental';
-import { getRemindersByUserId } from '../infrastructure/reminderRepository';
+import { D1Database } from "@cloudflare/workers-types/experimental";
+import { getRemindersByUserId } from "../infrastructure/reminderRepository";
 
 export interface ReminderListItem {
 	id: string;
@@ -12,7 +12,10 @@ export interface ReminderListItem {
  * リマインダー一覧を取得するユースケース
  * ビジネスロジックのみを担当し、結果を返す
  */
-export async function getReminderList(vo: { userId: string; db: D1Database }): Promise<ReminderListItem[]> {
+export async function getReminderList(vo: {
+	userId: string;
+	db: D1Database;
+}): Promise<ReminderListItem[]> {
 	const { userId, db } = vo;
 	const reminders = await getRemindersByUserId(db, userId);
 

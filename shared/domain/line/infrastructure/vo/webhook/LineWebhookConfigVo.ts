@@ -1,4 +1,4 @@
-import { ServerErrorException } from '../../../../../utils/ServerErrorException';
+import { ServerErrorException } from "../../../../../utils/ServerErrorException";
 
 export class LineWebhookConfigVo {
 	private constructor(
@@ -7,21 +7,29 @@ export class LineWebhookConfigVo {
 		public readonly allowedUserId?: string,
 	) {}
 
-	static create(params: { channelSecret?: string; channelToken?: string; allowedUserId?: string }): LineWebhookConfigVo {
+	static create(params: {
+		channelSecret?: string;
+		channelToken?: string;
+		allowedUserId?: string;
+	}): LineWebhookConfigVo {
 		const errors: string[] = [];
 
 		if (!params.channelSecret) {
-			errors.push('channelSecret is required');
+			errors.push("channelSecret is required");
 		}
 		if (!params.channelToken) {
-			errors.push('channelToken is required');
+			errors.push("channelToken is required");
 		}
 
 		if (errors.length > 0) {
-			throw new ServerErrorException('Invalid webhook config', 400, errors);
+			throw new ServerErrorException("Invalid webhook config", 400, errors);
 		}
 
-		return new LineWebhookConfigVo(params.channelSecret!, params.channelToken!, params.allowedUserId);
+		return new LineWebhookConfigVo(
+			params.channelSecret!,
+			params.channelToken!,
+			params.allowedUserId,
+		);
 	}
 
 	isAllowedUser(userId: string): boolean {

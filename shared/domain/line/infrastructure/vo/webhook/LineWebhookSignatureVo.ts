@@ -1,4 +1,4 @@
-import { ServerErrorException } from '../../../../../utils/ServerErrorException';
+import { ServerErrorException } from "../../../../../utils/ServerErrorException";
 
 /**
  * LINE Webhook署名のVO
@@ -14,10 +14,13 @@ export class LineWebhookSignatureVo {
 	/**
 	 * リクエストから署名情報を作成
 	 */
-	static async createFromRequest(request: Request, secret: string): Promise<LineWebhookSignatureVo> {
-		const signature = request.headers.get('x-line-signature');
+	static async createFromRequest(
+		request: Request,
+		secret: string,
+	): Promise<LineWebhookSignatureVo> {
+		const signature = request.headers.get("x-line-signature");
 		if (!signature) {
-			throw new ServerErrorException('Missing signature header', 401);
+			throw new ServerErrorException("Missing signature header", 401);
 		}
 
 		const bodyText = await request.text();
@@ -32,16 +35,22 @@ export class LineWebhookSignatureVo {
 		try {
 			const encoder = new TextEncoder();
 			const keyData = encoder.encode(this.secret);
-			const key = await crypto.subtle.importKey('raw', keyData, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+			const key = await crypto.subtle.importKey(
+				"raw",
+				keyData,
+				{ name: "HMAC", hash: "SHA-256" },
+				false,
+				["sign"],
+			);
 
 			// HMAC-SHA256 の署名を計算
-			const signatureBytes = await crypto.subtle.sign('HMAC', key, encoder.encode(this.bodyText));
+			const signatureBytes = await crypto.subtle.sign("HMAC", key, encoder.encode(this.bodyText));
 			const hashArray = Array.from(new Uint8Array(signatureBytes));
 			const computedSignature = btoa(String.fromCharCode(...hashArray)); // Base64 エンコード
 
 			return computedSignature === this.signature;
 		} catch (error) {
-			console.error('Signature validation error:', error);
+			console.error("Signature validation error:", error);
 			return false;
 		}
 	}

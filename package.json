@@ -3,15 +3,22 @@
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
-		"dev": "pnpm --filter line-webhook-server dev",
-		"deploy": "pnpm --filter line-webhook-server deploy",
-		"test": "pnpm --filter line-webhook-server test:unit",
-		"cf-typegen": "pnpm --filter line-webhook-server cf-typegen"
+		"dev": "turbo dev",
+		"deploy": "turbo deploy",
+		"test": "turbo test:unit",
+		"lint": "turbo lint",
+		"lint:fix": "turbo lint:fix",
+		"fmt": "oxfmt",
+		"fmt:check": "oxfmt --check",
+		"cf-typegen": "pnpm --filter line-reminder-bot cf-typegen"
 	},
 	"devDependencies": {
 		"@cloudflare/vitest-pool-workers": "^0.7.5",
 		"@cloudflare/workers-types": "^4.20250313.0",
 		"@types/node": "^25.0.10",
+		"oxfmt": "^0.34.0",
+		"oxlint": "^1.49.0",
+		"turbo": "^2.8.10",
 		"typescript": "^5.5.2",
 		"vitest": "~3.0.7",
 		"wrangler": "^4.0.0"

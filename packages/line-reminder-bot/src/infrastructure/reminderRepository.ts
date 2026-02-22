@@ -1,4 +1,4 @@
-import { Reminder, ReminderInput } from '../types';
+import { Reminder, ReminderInput } from "../types";
 
 /**
  * D1の結果（スネークケース）をReminderオブジェクト（キャメルケース）に変換
@@ -18,7 +18,11 @@ function mapDbRowToReminder(row: any): Reminder {
 /**
  * リマインダーをデータベースに保存
  */
-export async function saveReminder(db: D1Database, userId: string, input: ReminderInput): Promise<Reminder> {
+export async function saveReminder(
+	db: D1Database,
+	userId: string,
+	input: ReminderInput,
+): Promise<Reminder> {
 	const now = Date.now();
 	const reminder: Reminder = {
 		id: crypto.randomUUID(),
@@ -53,7 +57,10 @@ export async function saveReminder(db: D1Database, userId: string, input: Remind
  * ユーザーのリマインダー一覧を取得
  */
 export async function getRemindersByUserId(db: D1Database, userId: string): Promise<Reminder[]> {
-	const result = await db.prepare(`SELECT * FROM reminders WHERE user_id = ? ORDER BY execution_time ASC`).bind(userId).all();
+	const result = await db
+		.prepare(`SELECT * FROM reminders WHERE user_id = ? ORDER BY execution_time ASC`)
+		.bind(userId)
+		.all();
 
 	return (result.results || []).map(mapDbRowToReminder);
 }
@@ -62,13 +69,23 @@ export async function getRemindersByUserId(db: D1Database, userId: string): Prom
  * リマインダーを削除
  */
 export async function deleteReminder(db: D1Database, id: string, userId: string): Promise<boolean> {
-	const result = await db.prepare(`DELETE FROM reminders WHERE id = ? AND user_id = ?`).bind(id, userId).run();
+	const result = await db
+		.prepare(`DELETE FROM reminders WHERE id = ? AND user_id = ?`)
+		.bind(id, userId)
+		.run();
 
 	return result.success && (result.meta?.changes || 0) > 0;
 }
 
-export async function deleteRemindersByGroupId(db: D1Database, groupId: string, userId: string): Promise<number> {
-	const result = await db.prepare(`DELETE FROM reminders WHERE group_id = ? AND user_id = ?`).bind(groupId, userId).run();
+export async function deleteRemindersByGroupId(
+	db: D1Database,
+	groupId: string,
+	userId: string,
+): Promise<number> {
+	const result = await db
+		.prepare(`DELETE FROM reminders WHERE group_id = ? AND user_id = ?`)
+		.bind(groupId, userId)
+		.run();
 
 	return result.meta?.changes || 0;
 }
@@ -76,9 +93,15 @@ export async function deleteRemindersByGroupId(db: D1Database, groupId: string, 
 /**
  * groupIdに紐づくリマインダー一覧を取得
  */
-export async function getRemindersByGroupId(db: D1Database, groupId: string, userId: string): Promise<Reminder[]> {
+export async function getRemindersByGroupId(
+	db: D1Database,
+	groupId: string,
+	userId: string,
+): Promise<Reminder[]> {
 	const result = await db
-		.prepare(`SELECT * FROM reminders WHERE group_id = ? AND user_id = ? ORDER BY execution_time ASC`)
+		.prepare(
+			`SELECT * FROM reminders WHERE group_id = ? AND user_id = ? ORDER BY execution_time ASC`,
+		)
 		.bind(groupId, userId)
 		.all();
 
@@ -90,7 +113,10 @@ export async function getRemindersByGroupId(db: D1Database, groupId: string, use
  */
 export async function getDueReminders(db: D1Database): Promise<Reminder[]> {
 	const now = Date.now();
-	const result = await db.prepare(`SELECT * FROM reminders WHERE execution_time <= ?`).bind(now).all();
+	const result = await db
+		.prepare(`SELECT * FROM reminders WHERE execution_time <= ?`)
+		.bind(now)
+		.all();
 
 	return (result.results || []).map(mapDbRowToReminder);
 }

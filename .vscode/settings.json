@@ -2,5 +2,5 @@
 	"files.associations": {
 		"wrangler.json": "jsonc"
 	},
-	"cSpell.words": ["usecase", "usecases", "Zettelkasten"]
+	"cSpell.words": ["oxlint", "usecase", "usecases", "Zettelkasten"]
 }

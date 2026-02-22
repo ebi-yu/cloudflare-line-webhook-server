@@ -2,12 +2,12 @@
 
 ## 一覧
 
-| ストーリー | 関連する機能 |
-| --- | --- |
-| 後で思い出したいことをリマインド登録したい | [reminder-creation](./details/reminder-creation.md) |
-| 登録したリマインダーの一覧を確認したい | [reminder-list](./details/reminder-list.md) |
-| 特定のリマインダーを操作したい | [reminder-list](./details/reminder-list.md)  [reminder-update](./details/reminder-update.md), [reminder-delete](./details/reminder-delete.md) |
-| 途中でいらなくなったリマインダーを削除したい/間違えて登録してしまったリマインドを削除したい | [reminder-delete](./details/reminder-delete.md) |
+| ストーリー                                                                                  | 関連する機能                                                                                                                                 |
+| ------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| 後で思い出したいことをリマインド登録したい                                                  | [reminder-creation](./details/reminder-creation.md)                                                                                          |
+| 登録したリマインダーの一覧を確認したい                                                      | [reminder-list](./details/reminder-list.md)                                                                                                  |
+| 特定のリマインダーを操作したい                                                              | [reminder-list](./details/reminder-list.md) [reminder-update](./details/reminder-update.md), [reminder-delete](./details/reminder-delete.md) |
+| 途中でいらなくなったリマインダーを削除したい/間違えて登録してしまったリマインドを削除したい | [reminder-delete](./details/reminder-delete.md)                                                                                              |
 
 ## 後で思い出したいことをリマインド登録したい
 

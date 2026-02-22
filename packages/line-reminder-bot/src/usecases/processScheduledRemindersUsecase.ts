@@ -1,13 +1,13 @@
-import { sendTextMessage } from '@shared/domain/line/infrastructure/line-api-client/lineApiClient';
-import { getDueReminders } from '../infrastructure/reminderRepository';
-import { deleteReminderById } from './deleteReminderUsecase';
+import { sendTextMessage } from "@shared/domain/line/infrastructure/line-api-client/lineApiClient";
+import { getDueReminders } from "../infrastructure/reminderRepository";
+import { deleteReminderById } from "./deleteReminderUsecase";
 
 /**
  * スケジュール実行時の期限が来たリマインダーを処理するユースケース
  */
 export async function processScheduledReminders(env: any): Promise<void> {
 	try {
-		console.log('Checking due reminders...');
+		console.log("Checking due reminders...");
 		const dueReminders = await getDueReminders(env.DB);
 
 		console.log(`Found ${dueReminders.length} due reminders`);
@@ -15,20 +15,25 @@ export async function processScheduledReminders(env: any): Promise<void> {
 		for (const reminder of dueReminders) {
 			try {
 				// リマインドメッセージを送信（間隔ラベルを含む）
-				const label = reminder.intervalLabel ? `[${reminder.intervalLabel}] ` : '';
+				const label = reminder.intervalLabel ? `[${reminder.intervalLabel}] ` : "";
 				const quickReply = {
 					items: [
 						{
-							type: 'action',
+							type: "action",
 							action: {
-								type: 'postback',
-								label: 'リマインド削除',
+								type: "postback",
+								label: "リマインド削除",
 								data: `type=delete&groupId=${reminder.groupId}`,
 							},
 						},
 					],
 				};
-				await sendTextMessage(reminder.userId, `🔔 リマインド ${label}\n\n${reminder.message}`, env.LINE_CHANNEL_TOKEN, quickReply);
+				await sendTextMessage(
+					reminder.userId,
+					`🔔 リマインド ${label}\n\n${reminder.message}`,
+					env.LINE_CHANNEL_TOKEN,
+					quickReply,
+				);
 
 				// このリマインダーを削除（他の間隔のリマインダーは保持される）
 				await deleteReminderById({ db: env.DB, id: reminder.id, userId: reminder.userId });
@@ -37,6 +42,6 @@ export async function processScheduledReminders(env: any): Promise<void> {
 			}
 		}
 	} catch (error) {
-		console.error('Error in scheduled handler:', error);
+		console.error("Error in scheduled handler:", error);
 	}
 }
