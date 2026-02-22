@@ -1,7 +1,10 @@
 import type { ExecutionContext, ScheduledEvent } from '@cloudflare/workers-types';
 import { LineWebhookConfigVo, LineWebhookRequestVo } from '@shared/domain/line/infrastructure/vo';
 import { ServerErrorException } from '@shared/utils/ServerErrorException';
-import { handleCreateReminder, handleDeleteReminder, handleGetReminderList, handleShowReminderDetail } from './controllers/reminderController';
+import { handleCreateReminder } from './controllers/createReminderController';
+import { handleDeleteReminder } from './controllers/deleteReminderController';
+import { handleGetReminderList } from './controllers/getReminderListController';
+import { handleShowReminderDetail } from './controllers/showReminderDetailController';
 import { processScheduledReminders } from './usecases/processScheduledRemindersUsecase';
 
 // HTTPリクエストの受け取り、Webhook署名検証、イベントルーティング
