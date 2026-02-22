@@ -3,22 +3,16 @@
  * イベントデータのVO変換、Usecaseの呼び出し、LINE APIへの送信を担当
  */
 
-import {
-	sendReplyFlexMessage,
-	sendReplyTextMessage,
-} from "@shared/domain/line/infrastructure/line-api-client/lineApiClient";
-import { FlexBubble, FlexComponent, FlexContainer } from "@shared/domain/line/infrastructure/vo";
-import { LinePostbackShowReminderDetailVo } from "@shared/domain/line/infrastructure/vo/postback/LinePostbackShowReminderDetailVo";
-import { LinePostbackEvent } from "@shared/domain/line/infrastructure/vo/postback/LinePostbackVo";
-import { getReminderDetail, ReminderDetail } from "../usecases/getReminderDetailUsecase";
+import { sendReplyFlexMessage, sendReplyTextMessage } from '@shared/domain/line/infrastructure/line-api-client/lineApiClient';
+import { FlexBubble, FlexComponent, FlexContainer } from '@shared/domain/line/infrastructure/vo';
+import { LinePostbackShowReminderDetailVo } from '@shared/domain/line/infrastructure/vo/postback/LinePostbackShowReminderDetailVo';
+import { LinePostbackEvent } from '@shared/domain/line/infrastructure/vo/postback/LinePostbackVo';
+import { getReminderDetail, ReminderDetail } from '../usecases/getReminderDetailUsecase';
 
 /**
  * リマインダー詳細表示のコントローラー
  */
-export async function handleGetReminderDetail(vo: {
-	event: LinePostbackEvent;
-	env: Record<string, any>;
-}): Promise<void> {
+export async function handleGetReminderDetail(vo: { event: LinePostbackEvent; env: Record<string, any> }): Promise<void> {
 	const { event, env } = vo;
 
 	// VO変換（ドメインオブジェクトの作成）
@@ -36,22 +30,13 @@ export async function handleGetReminderDetail(vo: {
 	});
 
 	if (!detail) {
-		await sendReplyTextMessage(
-			postBackEvent.replyToken,
-			"リマインドが見つかりませんでした。",
-			env.LINE_CHANNEL_TOKEN,
-		);
+		await sendReplyTextMessage(postBackEvent.replyToken, 'リマインドが見つかりませんでした。', env.LINE_CHANNEL_TOKEN);
 		return;
 	}
 
 	// Flexメッセージ形式に変換して送信
 	const flexContainer = formatReminderDetailAsFlexContainer(detail);
-	await sendReplyFlexMessage(
-		postBackEvent.replyToken,
-		"リマインド詳細",
-		flexContainer,
-		env.LINE_CHANNEL_TOKEN,
-	);
+	await sendReplyFlexMessage(postBackEvent.replyToken, 'リマインド詳細', flexContainer, env.LINE_CHANNEL_TOKEN);
 }
 
 /**
@@ -60,47 +45,48 @@ export async function handleGetReminderDetail(vo: {
 function formatReminderDetailAsFlexContainer(detail: ReminderDetail): FlexContainer {
 	const bodyContents: FlexComponent[] = [
 		{
-			type: "text",
+			type: 'text',
 			text: detail.message,
-			weight: "bold",
+			size: 'sm',
+			weight: 'bold',
 		},
 	];
 
 	detail.scheduledTimes.forEach((t, index) => {
-		const dateStr = t.dateTime.toLocaleString("ja-JP", {
-			timeZone: "Asia/Tokyo",
-			month: "numeric",
-			day: "numeric",
-			hour: "2-digit",
-			minute: "2-digit",
+		const dateStr = t.dateTime.toLocaleString('ja-JP', {
+			timeZone: 'Asia/Tokyo',
+			month: 'numeric',
+			day: 'numeric',
+			hour: '2-digit',
+			minute: '2-digit',
 		});
 		bodyContents.push({
-			type: "text",
+			type: 'text',
 			text: `${t.label}: ${dateStr}`,
-			size: "sm",
-			margin: index === 0 ? "sm" : "xs",
+			size: 'sm',
+			margin: index === 0 ? 'sm' : 'xs',
 		});
 	});
 
 	const bubble: FlexBubble = {
-		type: "bubble",
+		type: 'bubble',
 		body: {
-			type: "box",
-			layout: "vertical",
+			type: 'box',
+			layout: 'vertical',
 			contents: bodyContents,
 		},
 		footer: {
-			type: "box",
-			layout: "vertical",
+			type: 'box',
+			layout: 'vertical',
 			contents: [
 				{
-					type: "button",
+					type: 'button',
 					action: {
-						type: "postback",
-						label: "🗑 削除",
+						type: 'postback',
+						label: '🗑 削除',
 						data: `type=delete&groupId=${detail.groupId}`,
 					},
-					style: "secondary",
+					style: 'secondary',
 				},
 			],
 		},
