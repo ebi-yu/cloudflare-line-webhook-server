@@ -49,10 +49,9 @@ function formatReminderDetailAsFlexContainer(detail: ReminderDetail): FlexContai
 			text: detail.message,
 			weight: 'bold',
 		},
-		{ type: 'spacer', size: 'sm' },
 	];
 
-	detail.scheduledTimes.forEach((t) => {
+	detail.scheduledTimes.forEach((t, index) => {
 		const dateStr = t.dateTime.toLocaleString('ja-JP', {
 			timeZone: 'Asia/Tokyo',
 			month: 'numeric',
@@ -64,6 +63,7 @@ function formatReminderDetailAsFlexContainer(detail: ReminderDetail): FlexContai
 			type: 'text',
 			text: `${t.label}: ${dateStr}`,
 			size: 'sm',
+			margin: index === 0 ? 'sm' : 'xs',
 		});
 	});
 
