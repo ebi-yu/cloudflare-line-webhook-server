@@ -6,7 +6,6 @@
 	"scripts": {
 		"dev": "wrangler dev",
 		"deploy": "wrangler deploy",
-		"test": "vitest",
 		"test:unit": "vitest run src/**/*.test.ts",
 		"test:integration": "vitest run tests/integration",
 		"test:watch": "vitest watch",

@@ -1,7 +1,11 @@
 import type { ExecutionContext, ScheduledEvent } from '@cloudflare/workers-types';
+import { checkUserAuthorization } from '@shared/domain/line/application/checkUserAuthorization';
 import { LineWebhookConfigVo, LineWebhookRequestVo } from '@shared/domain/line/infrastructure/vo';
 import { ServerErrorException } from '@shared/utils/ServerErrorException';
-import { handleCreateReminder, handleDeleteReminder, handleGetReminderList } from './controllers/reminderController';
+import { handleCreateReminder } from './controllers/createReminderController';
+import { handleDeleteReminder } from './controllers/deleteReminderController';
+import { handleGetReminderDetail } from './controllers/getReminderDetailController';
+import { handleGetReminderList } from './controllers/getReminderListController';
 import { processScheduledReminders } from './usecases/processScheduledRemindersUsecase';
 
 // HTTPリクエストの受け取り、Webhook署名検証、イベントルーティング
@@ -19,29 +23,37 @@ export default {
 			const webhookRequest = await LineWebhookRequestVo.createFromRequest(request, config);
 			const event = webhookRequest.event;
 
-			// 3. イベントタイプによるルーティング（テキストメッセージ → リマインダー作成）
+			// 3. ユーザー認証（全イベント共通）
+			await checkUserAuthorization({
+				userId: event.source?.userId ?? '',
+				replyToken: event.replyToken ?? '',
+				config,
+			});
+
+			// 4. イベントタイプによるルーティング（テキストメッセージ → リマインダー作成）
 			if (LineWebhookRequestVo.isTextMessageEvent(event)) {
-				await handleCreateReminder({ event, env, config });
+				await handleCreateReminder({ event, env });
 				return new Response('OK', { status: 200 });
 			}
 
-			// 4. Postbackイベントのルーティング
+			// 5. Postbackイベントのルーティング
 			if (LineWebhookRequestVo.isPostbackEvent(event)) {
 				const parsedParams = new URLSearchParams(event.postback.data);
 
 				if (parsedParams.get('type') === 'list') {
-					await handleGetReminderList({ event, env, config });
+					await handleGetReminderList({ event, env });
+					return new Response('OK', { status: 200 });
+				}
+
+				if (parsedParams.get('type') === 'detail') {
+					await handleGetReminderDetail({ event, env });
 					return new Response('OK', { status: 200 });
 				}
 
 				if (parsedParams.get('type') === 'delete') {
-					await handleDeleteReminder({ event, env, config });
+					await handleDeleteReminder({ event, env });
 					return new Response('OK', { status: 200 });
 				}
-
-				// TODO: type=detail は詳細表示機能として実装予定。
-				// formatRemindersAsButtons の data: `type=detail&groupId=...` で生成されるボタンに対応するルーティングが未実装のため、
-				// 現時点で一覧ボタンを押すと 400 が返る。詳細表示機能のイシューで実装予定。
 			}
 
 			throw new ServerErrorException('Unsupported event type', 400);

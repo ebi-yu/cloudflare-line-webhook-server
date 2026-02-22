@@ -22,3 +22,8 @@ LINE BotからWebhookイベントを受け取り、処理を実行する
 | [テスト戦略](./packages/line-reminder-bot/docs/testing-strategy.md) | テストの方針とテストレベルごとの戦略を記述 |
 | [データベース設計](./packages/line-reminder-bot/docs/database-schema.md) | D1データベースのスキーマ設計とエンティティの関係を記述 |
 | [ユーザーストーリー](./packages/line-reminder-bot/docs/user-story.md) | ユーザーストーリーとそれに対応する機能要件を記述 |
+
+## 実装ルール
+
+- **絶対にテストから実装すること（TDD）**。実装コードよりも先にテストコードを書くこと。
+- テストを実装する際は、必ず [テスト戦略](./packages/line-reminder-bot/docs/testing-strategy.md) を読んでから実装すること。
