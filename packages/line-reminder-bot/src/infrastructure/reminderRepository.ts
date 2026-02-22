@@ -8,8 +8,8 @@ function mapDbRowToReminder(row: any): Reminder {
 		id: row.id,
 		userId: row.user_id,
 		message: row.message,
-		executionTime: row.execution_time,
-		createdAt: row.created_at,
+		executionTime: Number(row.execution_time),
+		createdAt: Number(row.created_at),
 		groupId: row.group_id,
 		intervalLabel: row.interval_label,
 	};
@@ -71,6 +71,18 @@ export async function deleteRemindersByGroupId(db: D1Database, groupId: string, 
 	const result = await db.prepare(`DELETE FROM reminders WHERE group_id = ? AND user_id = ?`).bind(groupId, userId).run();
 
 	return result.meta?.changes || 0;
+}
+
+/**
+ * groupIdに紐づくリマインダー一覧を取得
+ */
+export async function getRemindersByGroupId(db: D1Database, groupId: string, userId: string): Promise<Reminder[]> {
+	const result = await db
+		.prepare(`SELECT * FROM reminders WHERE group_id = ? AND user_id = ? ORDER BY execution_time ASC`)
+		.bind(groupId, userId)
+		.all();
+
+	return (result.results || []).map(mapDbRowToReminder);
 }
 
 /**

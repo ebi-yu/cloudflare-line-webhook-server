@@ -5,14 +5,16 @@
 
 import { checkUserAuthorization } from '@shared/domain/line/application/checkUserAuthorization';
 import { sendReplyFlexMessage, sendReplyTextMessage } from '@shared/domain/line/infrastructure/line-api-client/lineApiClient';
-import { ButtonMenuFlexContainerVo, ButtonMenuItem } from '@shared/domain/line/infrastructure/vo';
+import { ButtonMenuFlexContainerVo, ButtonMenuItem, FlexBubble, FlexComponent, FlexContainer } from '@shared/domain/line/infrastructure/vo';
 import { LinePostbackDeleteReminderVo } from '@shared/domain/line/infrastructure/vo/postback/LinePostbackDeleteReminderVo';
+import { LinePostbackShowReminderDetailVo } from '@shared/domain/line/infrastructure/vo/postback/LinePostbackShowReminderDetailVo';
 import { LinePostbackShowReminderListVo } from '@shared/domain/line/infrastructure/vo/postback/LinePostbackShowReminderListVo';
 import { LinePostbackEvent } from '@shared/domain/line/infrastructure/vo/postback/LinePostbackVo';
 import { LineWebhookConfigVo } from '@shared/domain/line/infrastructure/vo/webhook/LineWebhookConfigVo';
 import { LineTextMessageEvent, LineWebhookMessageVo } from '@shared/domain/line/infrastructure/vo/webhook/LineWebhookMessageVo';
 import { createReminder, CreateReminderResult } from '../usecases/createReminderUsecase';
 import { deleteReminder } from '../usecases/deleteReminderUsecase';
+import { getReminderDetail, ReminderDetail } from '../usecases/getReminderDetailUsecase';
 import { getReminderList, ReminderListItem } from '../usecases/getRemindersListUsecase';
 
 // ボタンラベルの最大文字数
@@ -90,6 +92,47 @@ export async function handleDeleteReminder(vo: {
 }
 
 /**
+ * リマインダー詳細表示のコントローラー
+ */
+export async function handleShowReminderDetail(vo: {
+	event: LinePostbackEvent;
+	env: Record<string, any>;
+	config: LineWebhookConfigVo;
+}): Promise<void> {
+	const { event, env, config } = vo;
+
+	// VO変換（ドメインオブジェクトの作成）
+	const postBackEvent = LinePostbackShowReminderDetailVo.create({
+		data: event.postback.data,
+		userId: event.source?.userId,
+		replyToken: event.replyToken,
+	});
+
+	// ユーザー認証（ビジネスルール）
+	await checkUserAuthorization({
+		userId: postBackEvent.userId,
+		replyToken: postBackEvent.replyToken,
+		config,
+	});
+
+	// Usecaseを実行（ビジネスロジック）
+	const detail = await getReminderDetail({
+		groupId: postBackEvent.groupId,
+		userId: postBackEvent.userId,
+		db: env.DB,
+	});
+
+	if (!detail) {
+		await sendReplyTextMessage(postBackEvent.replyToken, 'リマインドが見つかりませんでした。', env.LINE_CHANNEL_TOKEN);
+		return;
+	}
+
+	// Flexメッセージ形式に変換して送信
+	const flexContainer = formatReminderDetailAsFlexContainer(detail);
+	await sendReplyFlexMessage(postBackEvent.replyToken, 'リマインド詳細', flexContainer, env.LINE_CHANNEL_TOKEN);
+}
+
+/**
  * リマインダー一覧表示のコントローラー
  */
 export async function handleGetReminderList(vo: {
@@ -164,4 +207,59 @@ function formatRemindersAsButtons(reminders: ReminderListItem[]): ButtonMenuItem
 		type: 'postback',
 		data: `type=detail&groupId=${r.groupId ?? r.id}`,
 	}));
+}
+
+/**
+ * リマインダー詳細をFlexContainer形式に変換
+ */
+function formatReminderDetailAsFlexContainer(detail: ReminderDetail): FlexContainer {
+	const bodyContents: FlexComponent[] = [
+		{
+			type: 'text',
+			text: detail.message,
+			weight: 'bold',
+		},
+		{ type: 'spacer', size: 'sm' },
+	];
+
+	detail.scheduledTimes.forEach((t) => {
+		const dateStr = t.dateTime.toLocaleString('ja-JP', {
+			timeZone: 'Asia/Tokyo',
+			month: 'numeric',
+			day: 'numeric',
+			hour: '2-digit',
+			minute: '2-digit',
+		});
+		bodyContents.push({
+			type: 'text',
+			text: `${t.label}: ${dateStr}`,
+			size: 'sm',
+		});
+	});
+
+	const bubble: FlexBubble = {
+		type: 'bubble',
+		body: {
+			type: 'box',
+			layout: 'vertical',
+			contents: bodyContents,
+		},
+		footer: {
+			type: 'box',
+			layout: 'vertical',
+			contents: [
+				{
+					type: 'button',
+					action: {
+						type: 'postback',
+						label: '🗑 削除',
+						data: `type=delete&groupId=${detail.groupId}`,
+					},
+					style: 'secondary',
+				},
+			],
+		},
+	};
+
+	return bubble;
 }
