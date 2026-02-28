@@ -10,12 +10,14 @@
 		"lint:fix": "turbo lint:fix",
 		"fmt": "oxfmt",
 		"fmt:check": "oxfmt --check",
-		"cf-typegen": "pnpm --filter line-reminder-bot cf-typegen"
+		"cf-typegen": "pnpm --filter line-reminder-bot cf-typegen",
+		"prepare": "husky"
 	},
 	"devDependencies": {
 		"@cloudflare/vitest-pool-workers": "^0.7.5",
 		"@cloudflare/workers-types": "^4.20250313.0",
 		"@types/node": "^25.0.10",
+		"husky": "^9.1.7",
 		"oxfmt": "^0.34.0",
 		"oxlint": "^1.49.0",
 		"turbo": "^2.8.10",
