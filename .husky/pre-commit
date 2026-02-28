@@ -1,3 +1,2 @@
 pnpm lint:fix
 pnpm fmt
-git add .
