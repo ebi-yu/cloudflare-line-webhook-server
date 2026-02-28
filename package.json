@@ -18,12 +18,19 @@
 		"@cloudflare/workers-types": "^4.20250313.0",
 		"@types/node": "^25.0.10",
 		"husky": "^9.1.7",
+		"lint-staged": "^16.2.7",
 		"oxfmt": "^0.34.0",
 		"oxlint": "^1.49.0",
 		"turbo": "^2.8.10",
 		"typescript": "^5.5.2",
 		"vitest": "~3.0.7",
 		"wrangler": "^4.0.0"
+	},
+	"lint-staged": {
+		"*.{ts,tsx}": [
+			"eslint --fix",
+			"prettier --write"
+		]
 	},
 	"packageManager": "pnpm@9.0.0"
 }
